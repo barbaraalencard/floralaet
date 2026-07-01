@@ -34,199 +34,206 @@
       </div>
     </div>
 
-    <header class="site-header">
-      <a class="brand" href="#inicio" aria-label="Início do Cantinho da Flora">
-        <span class="brand-mark">FL</span>
-        <span>
-          Flora Laet
-          <small>cantinho das leitoras</small>
-        </span>
-      </a>
-      <nav class="room-nav" aria-label="Cômodos do site">
-        <a href="#mural">Mural</a>
-        <a href="#diario">Diário</a>
-        <a href="#extras">Extras</a>
-      </nav>
-    </header>
+    <div class="scrapbook-shell">
+      <aside class="left-rail" aria-label="Navegação principal">
+        <a class="script-logo" href="#inicio" aria-label="Início do Cantinho da Flora">
+          Flora<br />Laet
+        </a>
+        <p class="rail-bio">
+          escritora de histórias apaixonantes e finais que valem a espera.
+        </p>
 
-    <main id="inicio">
-      <section class="hero-section" aria-labelledby="heroTitle">
-        <div class="hero-copy">
-          <p class="eyebrow">Atualmente escrevendo</p>
-          <h1 id="heroTitle">Herdeiros de Mayfair III</h1>
-          <p class="lead">
-            Um refúgio simples para acompanhar a escrita, deixar cartas e
-            voltar sempre que bater saudade dos bastidores.
-          </p>
+        <nav class="rail-nav">
+          <a class="active" href="#inicio"><span aria-hidden="true">⌂</span> início</a>
+          <a href="#diario"><span aria-hidden="true">☕</span> diário</a>
+          <a href="#extras"><span aria-hidden="true">☆</span> extras</a>
+          <a href="#mural"><span aria-hidden="true">☏</span> mural</a>
+          <a href="login.html"><span aria-hidden="true">♡</span> área da flora</a>
+        </nav>
 
-          <div class="progress-tool" aria-label="Progresso do próximo livro">
-            <div class="progress-topline">
-              <span>Manuscrito em andamento</span>
-              <strong>63%</strong>
-            </div>
-            <div class="progress-rail" aria-hidden="true">
-              <span style="--progress: 63%"></span>
-            </div>
-            <div class="progress-notes">
-              <p>
-                <strong>Última atualização</strong>
-                Capítulo 18 concluído.
-              </p>
-              <p>
-                <strong>Próximo marco</strong>
-                Revisar a cena do baile.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <figure class="hero-visual">
+        <figure class="rail-photo">
           <img
             src="assets/escrivaninha-collage.png"
-            alt="Colagem delicada de escrivaninha com papeis, fitas, polaroids e objetos de escrita"
+            alt="Detalhe de escrivaninha com papéis e objetos de escrita"
           />
-          <figcaption>
-            <span aria-hidden="true">✎</span>
-            A tinta ainda está fresca.
-          </figcaption>
         </figure>
-      </section>
 
-      <section class="visit-strip" aria-labelledby="visitTitle">
-        <div>
-          <p class="eyebrow" id="visitTitle">Da última vez que você esteve aqui</p>
-          <p id="visitSummary">
-            A escrivaninha ganhou novas cartas, uma nota curta e um extra
-            guardado na gaveta.
-          </p>
+        <div class="rail-note">
+          <span>lembrete da flora:</span>
+          <p>você não precisa ter tudo hoje. basta um capítulo de cada vez.</p>
         </div>
-        <a class="button ghost" href="#mural">
-          <span aria-hidden="true">♡</span>
-          Deixar uma carta
-        </a>
-      </section>
+      </aside>
 
-      <section class="band" id="mural" aria-labelledby="muralTitle">
-        <div class="section-intro">
-          <p class="eyebrow">Livro de visitas</p>
-          <h2 id="muralTitle">Mural das leitoras</h2>
-          <p>
-            Cartas públicas, respostas delicadas e zero algoritmo. Só conversa.
-          </p>
-        </div>
+      <div class="main-board">
+        <header class="topline">
+          <p><span>oi, leitora!</span> ✨</p>
+          <p>que bom ter você aqui.</p>
+          <p>este é nosso cantinho.</p>
+          <a href="login.html" aria-label="Entrar na área da Flora">buscar...</a>
+        </header>
 
-        <form class="letter-form" id="letterForm">
-          <div class="emoji-picker" aria-label="Escolha um emoji">
-            <input id="readerEmoji" name="emoji" type="hidden" value="🌷" />
-            <button class="emoji-option active" type="button" data-emoji="🌷" aria-label="Flor">
-              🌷
-            </button>
-            <button class="emoji-option" type="button" data-emoji="🌙" aria-label="Lua">
-              🌙
-            </button>
-            <button class="emoji-option" type="button" data-emoji="☕" aria-label="Cafe">
-              ☕
-            </button>
-            <button class="emoji-option" type="button" data-emoji="📚" aria-label="Livros">
-              📚
-            </button>
-            <button class="emoji-option" type="button" data-emoji="✨" aria-label="Estrela">
-              ✨
-            </button>
-          </div>
+        <main id="inicio">
+          <section class="hero-board" aria-labelledby="heroTitle">
+            <div class="welcome-copy">
+              <span class="sparkle" aria-hidden="true">✧</span>
+              <h1 id="heroTitle">
+                bem-vinda ao<br />
+                universo de<br />
+                <span>Flora Laet</span>
+              </h1>
+              <p>aqui, cada história ganha vida e você faz parte dessa jornada.</p>
+              <span class="doodle-heart" aria-hidden="true">♡</span>
+            </div>
 
-          <label>
-            <span>Seu nome</span>
-            <input
-              id="readerName"
-              name="name"
-              maxlength="32"
-              placeholder="Ana Clara"
-              required
-            />
-          </label>
+            <figure class="hero-photo">
+              <img
+                src="assets/escrivaninha-collage.png"
+                alt="Colagem de papéis, fotos e objetos de escrita na escrivaninha"
+              />
+            </figure>
 
-          <label class="letter-message">
-            <span>Sua carta</span>
-            <textarea
-              id="readerMessage"
-              name="message"
-              maxlength="220"
-              placeholder="Estou ansiosa pelo próximo capítulo..."
-              required
-            ></textarea>
-          </label>
+            <article class="progress-sheet" aria-label="Progresso do próximo livro">
+              <p class="eyebrow">Atualmente escrevendo <span aria-hidden="true">♥</span></p>
+              <h2 id="bookTitle">Herdeiros de Mayfair III</h2>
+              <div class="progress-row">
+                <div class="progress-rail" aria-hidden="true">
+                  <span id="progressFill" style="--progress: 63%"></span>
+                </div>
+                <strong id="progressValue">63%</strong>
+              </div>
+              <p class="progress-quote" id="progressQuote">
+                "Toda história tem seu tempo. A nossa está sendo escrita."
+              </p>
+              <dl class="progress-facts">
+                <div>
+                  <dt>última atualização</dt>
+                  <dd id="lastUpdate">25 de junho</dd>
+                </div>
+                <div>
+                  <dt>capítulo atual</dt>
+                  <dd><span id="currentChapter">17</span> de <span id="totalChapters">27</span></dd>
+                </div>
+                <div>
+                  <dt>próximo marco</dt>
+                  <dd id="nextMilestone">capítulo 18</dd>
+                </div>
+              </dl>
+            </article>
 
-          <button class="button primary" type="submit">
-            <span aria-hidden="true">✉</span>
-            Deixar carta
-          </button>
-          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
-        </form>
+            <aside class="diary-preview" aria-labelledby="diaryPreviewTitle">
+              <h2 id="diaryPreviewTitle">diário da flora ❀</h2>
+              <p>pensamentos, desabafos e devaneios de uma escritora.</p>
+              <div class="diary-preview-list" id="diaryPreviewList"></div>
+              <a href="#diario">ver todos os bilhetes →</a>
+            </aside>
+          </section>
 
-        <div class="message-grid" id="messageList" aria-live="polite"></div>
-      </section>
+          <section class="pink-ticket" aria-label="Recado da Flora">
+            obrigada por estarem aqui!<br />
+            vocês me inspiram todos os dias. ♡
+          </section>
 
-      <section class="band diary-band" id="diario" aria-labelledby="diaryTitle">
-        <div class="section-intro">
-          <p class="eyebrow">Notas da escrivaninha</p>
-          <h2 id="diaryTitle">Diário da Flora</h2>
-          <p>Comentários curtos sobre escrita, livros e pequenos desabafos.</p>
-        </div>
+          <section class="paper-section mural-section" id="mural" aria-labelledby="muralTitle">
+            <div class="section-title-row">
+              <div>
+                <h2 id="muralTitle">mural dos leitores</h2>
+                <p>deixe sua mensagem para mim e para outros leitores!</p>
+              </div>
+              <button class="button tape-button" type="button" id="focusMessageButton">
+                ✎ escrever mensagem
+              </button>
+            </div>
 
-        <div class="notes-stream">
-          <article class="note-card">
-            <time datetime="2026-06-28">28/06</time>
-            <p>Hoje descobri que um personagem estava mentindo para mim desde o capítulo 6.</p>
-          </article>
-          <article class="note-card">
-            <time datetime="2026-06-26">26/06</time>
-            <p>Escrever romance de época deveria dar direito a um diploma em pesquisa histórica.</p>
-          </article>
-          <article class="note-card">
-            <time datetime="2026-06-25">25/06</time>
-            <p>Terminei uma cena que estava me perseguindo há dias. Sem spoilers, mas tem baile.</p>
-          </article>
-        </div>
-      </section>
+            <form class="letter-form" id="letterForm">
+              <div class="emoji-picker" aria-label="Escolha um emoji">
+                <input id="readerEmoji" name="emoji" type="hidden" value="🌷" />
+                <button class="emoji-option active" type="button" data-emoji="🌷" aria-label="Flor">
+                  🌷
+                </button>
+                <button class="emoji-option" type="button" data-emoji="🌙" aria-label="Lua">
+                  🌙
+                </button>
+                <button class="emoji-option" type="button" data-emoji="☕" aria-label="Café">
+                  ☕
+                </button>
+                <button class="emoji-option" type="button" data-emoji="📚" aria-label="Livros">
+                  📚
+                </button>
+                <button class="emoji-option" type="button" data-emoji="✨" aria-label="Estrela">
+                  ✨
+                </button>
+              </div>
 
-      <section class="band" id="extras" aria-labelledby="extrasTitle">
-        <div class="section-intro">
-          <p class="eyebrow">Gaveta de segredos</p>
-          <h2 id="extrasTitle">Extras dos livros</h2>
-          <p>Ilustrações, árvores genealógicas, playlists e pequenos presentes.</p>
-        </div>
+              <label>
+                <span>seu nome</span>
+                <input
+                  id="readerName"
+                  name="name"
+                  maxlength="32"
+                  placeholder="Ana Clara"
+                  required
+                />
+              </label>
 
-        <div class="extras-grid">
-          <article class="extra-card available">
-            <span class="extra-kicker">Mayfair</span>
-            <h3>Árvore genealógica</h3>
-            <p>Famílias, conexões e pequenos segredos sem spoilers grandes.</p>
-            <a href="#" aria-label="Abrir árvore genealógica">Abrir</a>
-          </article>
+              <label class="letter-message">
+                <span>sua carta</span>
+                <textarea
+                  id="readerMessage"
+                  name="message"
+                  maxlength="220"
+                  placeholder="Estou ansiosa pelo próximo capítulo..."
+                  required
+                ></textarea>
+              </label>
 
-          <article class="extra-card">
-            <span class="extra-kicker">Playlist</span>
-            <h3>Para escrever o baile</h3>
-            <p>Músicas que acompanharam os capítulos mais dramáticos.</p>
-            <a href="#" aria-label="Abrir playlist">Ouvir</a>
-          </article>
+              <button class="button primary" type="submit">deixar carta</button>
+              <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+            </form>
 
-          <article class="extra-card soon">
-            <span class="extra-kicker">Em breve</span>
-            <h3>Cena extra</h3>
-            <p>Um bilhete guardado para quando o manuscrito passar de 70%.</p>
-            <span class="locked">Guardado na gaveta</span>
-          </article>
-        </div>
-      </section>
-    </main>
+            <div class="message-grid" id="messageList" aria-live="polite"></div>
+          </section>
 
-    <footer class="site-footer">
-      <p>Feito para voltar quando der saudade da Flora.</p>
-      <a href="#inicio">Voltar ao topo</a>
-    </footer>
+          <section class="paper-section extras-section" id="extras" aria-labelledby="extrasTitle">
+            <div class="section-title-row">
+              <div>
+                <h2 id="extrasTitle">extras</h2>
+                <p>explore mais sobre os livros e o universo.</p>
+              </div>
+              <a href="login.html">editar conteúdos →</a>
+            </div>
+            <div class="extras-grid" id="extrasList"></div>
+          </section>
 
+          <section class="paper-section diary-full" id="diario" aria-labelledby="diaryTitle">
+            <div class="section-title-row">
+              <div>
+                <h2 id="diaryTitle">diário da flora</h2>
+                <p>bilhetes curtinhos para quem gosta dos bastidores.</p>
+              </div>
+            </div>
+            <div class="notes-stream" id="diaryFullList"></div>
+          </section>
+
+          <section class="newsletter-card">
+            <div>
+              <h2>fique por dentro das novidades! ✉</h2>
+              <p>receba em primeira mão sobre novos capítulos, conteúdos exclusivos e bastidores.</p>
+            </div>
+            <form>
+              <input type="email" placeholder="seu melhor e-mail" aria-label="Seu melhor e-mail" />
+              <button class="button primary" type="submit">quero receber!</button>
+            </form>
+          </section>
+        </main>
+
+        <footer class="site-footer">
+          <p>feito com ♡ para leitoras incríveis</p>
+          <p>© 2026 Flora Laet</p>
+        </footer>
+      </div>
+    </div>
+
+    <script src="data.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -10,10 +10,14 @@ Primeira versão do site para leitoras, baseada no briefing do chat compartilhad
 - Diário da Flora com notas curtas no estilo "Tumblr moderno".
 - Área de extras para árvore genealógica, playlist e cena extra.
 - Dados salvos localmente no navegador usando `localStorage`.
+- Login em `login.html` e painel em `admin.html`.
+- Painel para atualizar progresso, publicar bilhetes, adicionar extras e responder ao mural.
 
 ## Como testar
 
 Abra `index.html` no navegador ou rode um servidor local simples dentro desta pasta.
+
+Senha provisória do painel: `flora2026`
 
 ## Próximo passo natural
 

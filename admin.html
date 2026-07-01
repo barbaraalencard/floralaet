@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Painel da Flora</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell" id="adminRoot">
+      <header class="admin-header">
+        <h1>escrivaninha<br />da flora</h1>
+        <div class="auth-actions">
+          <a class="button ghost" href="index.html">ver site</a>
+          <button class="button primary" id="logoutButton" type="button">sair</button>
+        </div>
+      </header>
+
+      <div class="admin-grid">
+        <div>
+          <section class="admin-card" aria-labelledby="bookAdminTitle">
+            <h2 id="bookAdminTitle">progresso do livro</h2>
+            <form class="admin-form" id="bookForm">
+              <label class="full">
+                <span>título do livro</span>
+                <input name="title" required />
+              </label>
+              <label>
+                <span>progresso (%)</span>
+                <input name="progress" type="number" min="0" max="100" required />
+              </label>
+              <label>
+                <span>última atualização</span>
+                <input name="lastUpdate" required />
+              </label>
+              <label>
+                <span>capítulo atual</span>
+                <input name="currentChapter" type="number" min="0" required />
+              </label>
+              <label>
+                <span>total de capítulos</span>
+                <input name="totalChapters" type="number" min="1" required />
+              </label>
+              <label class="full">
+                <span>próximo marco</span>
+                <input name="nextMilestone" required />
+              </label>
+              <label class="full">
+                <span>frase da barra</span>
+                <textarea name="quote" rows="3" required></textarea>
+              </label>
+              <div class="admin-actions">
+                <button class="button primary" type="submit">salvar progresso</button>
+                <p class="admin-status" id="bookStatus" role="status" aria-live="polite"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="admin-card" aria-labelledby="messagesAdminTitle">
+            <h2 id="messagesAdminTitle">mural</h2>
+            <div class="admin-list" id="adminMessages"></div>
+          </section>
+        </div>
+
+        <div>
+          <section class="admin-card" aria-labelledby="diaryAdminTitle">
+            <h2 id="diaryAdminTitle">novo bilhete</h2>
+            <form class="admin-form" id="diaryForm">
+              <label>
+                <span>data</span>
+                <input name="date" placeholder="01/07" required />
+              </label>
+              <label>
+                <span>hora</span>
+                <input name="time" placeholder="10:42" required />
+              </label>
+              <label class="full">
+                <span>texto</span>
+                <textarea name="text" rows="4" maxlength="260" required></textarea>
+              </label>
+              <div class="admin-actions">
+                <button class="button primary" type="submit">publicar bilhete</button>
+              </div>
+            </form>
+            <div class="admin-list" id="diaryAdminList"></div>
+          </section>
+
+          <section class="admin-card" aria-labelledby="extrasAdminTitle">
+            <h2 id="extrasAdminTitle">novo extra</h2>
+            <form class="admin-form" id="extraForm">
+              <label>
+                <span>etiqueta</span>
+                <input name="label" placeholder="mapas" required />
+              </label>
+              <label>
+                <span>título</span>
+                <input name="title" required />
+              </label>
+              <label class="full">
+                <span>descrição</span>
+                <textarea name="description" rows="3" required></textarea>
+              </label>
+              <label class="full">
+                <span>imagem</span>
+                <input name="image" placeholder="assets/escrivaninha-collage.png" />
+              </label>
+              <label>
+                <span>guardado?</span>
+                <input name="locked" type="checkbox" />
+              </label>
+              <div class="admin-actions">
+                <button class="button primary" type="submit">publicar extra</button>
+              </div>
+            </form>
+            <div class="admin-list" id="extrasAdminList"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

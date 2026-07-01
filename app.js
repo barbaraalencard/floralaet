@@ -1,45 +1,12 @@
-const messageKey = "flora-reader-messages";
-const welcomeKey = "flora-skip-welcome";
-const lastVisitKey = "flora-last-visit";
-
-const defaultMessages = [
-  {
-    id: crypto.randomUUID(),
-    emoji: "🌷",
-    name: "Ana Clara",
-    text: "Estou ansiosa por Herdeiros de Mayfair III. Essa barrinha vai virar meu ritual de domingo.",
-    createdAt: "2026-06-28T15:15:00.000Z",
-    replies: [
-      {
-        emoji: "✒",
-        name: "Flora",
-        text: "A barrinha cresceu mais um pouquinho hoje.",
-      },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    emoji: "☕",
-    name: "Marina",
-    text: "Vim deixar café imaginário e paciência para a cena do baile.",
-    createdAt: "2026-06-27T18:30:00.000Z",
-    replies: [],
-  },
-  {
-    id: crypto.randomUUID(),
-    emoji: "🌙",
-    name: "Bia",
-    text: "Amei esse cantinho. Parece que a gente entrou mesmo na sua escrivaninha.",
-    createdAt: "2026-06-26T20:10:00.000Z",
-    replies: [
-      {
-        emoji: "📚",
-        name: "Livia",
-        text: "Sim! Quero voltar só para ver se tem bilhete novo.",
-      },
-    ],
-  },
-];
+const {
+  loadMessages,
+  loadState,
+  saveMessages,
+  messageKey,
+  welcomeKey,
+  lastVisitKey,
+  createId,
+} = window.FloraData;
 
 const welcomeScreen = document.querySelector("#welcomeScreen");
 const enterButton = document.querySelector("#enterButton");
@@ -49,28 +16,13 @@ const messageList = document.querySelector("#messageList");
 const formStatus = document.querySelector("#formStatus");
 const readerEmoji = document.querySelector("#readerEmoji");
 const emojiButtons = document.querySelectorAll(".emoji-option");
-const visitSummary = document.querySelector("#visitSummary");
+const focusMessageButton = document.querySelector("#focusMessageButton");
+const diaryPreviewList = document.querySelector("#diaryPreviewList");
+const diaryFullList = document.querySelector("#diaryFullList");
+const extrasList = document.querySelector("#extrasList");
 
 let messages = loadMessages();
-
-function loadMessages() {
-  const stored = localStorage.getItem(messageKey);
-
-  if (!stored) {
-    return defaultMessages;
-  }
-
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : defaultMessages;
-  } catch {
-    return defaultMessages;
-  }
-}
-
-function saveMessages() {
-  localStorage.setItem(messageKey, JSON.stringify(messages));
-}
+let siteState = loadState();
 
 function createElement(tagName, className, text) {
   const element = document.createElement(tagName);
@@ -79,11 +31,77 @@ function createElement(tagName, className, text) {
   return element;
 }
 
+function setText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = value;
+}
+
 function formatDate(value) {
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
   }).format(new Date(value));
+}
+
+function renderBook() {
+  const book = siteState.book;
+  const progress = Math.max(0, Math.min(100, Number(book.progress) || 0));
+
+  setText("#bookTitle", book.title);
+  setText("#progressValue", `${progress}%`);
+  setText("#progressQuote", book.quote);
+  setText("#lastUpdate", book.lastUpdate);
+  setText("#currentChapter", book.currentChapter);
+  setText("#totalChapters", book.totalChapters);
+  setText("#nextMilestone", book.nextMilestone);
+
+  const fill = document.querySelector("#progressFill");
+  if (fill) fill.style.setProperty("--progress", `${progress}%`);
+}
+
+function renderDiary() {
+  diaryPreviewList.replaceChildren();
+  diaryFullList.replaceChildren();
+
+  siteState.diary.slice(0, 3).forEach((note) => {
+    const card = createElement("article", "diary-note");
+    const stamp = createElement("time", null, `${note.date} · ${note.time}`);
+    const text = createElement("p", null, note.text);
+    card.append(stamp, text);
+    diaryPreviewList.append(card);
+  });
+
+  siteState.diary.forEach((note) => {
+    const card = createElement("article", "note-card");
+    const stamp = createElement("time", null, `${note.date} · ${note.time}`);
+    const text = createElement("p", null, note.text);
+    card.append(stamp, text);
+    diaryFullList.append(card);
+  });
+}
+
+function renderExtras() {
+  extrasList.replaceChildren();
+
+  siteState.extras.forEach((extra) => {
+    const article = createElement("article", "extra-card");
+    const img = document.createElement("img");
+    img.src = extra.image || "assets/escrivaninha-collage.png";
+    img.alt = "";
+
+    const label = createElement("span", "extra-label", extra.label);
+    const title = createElement("h3", null, extra.title);
+    const description = createElement("p", null, extra.description);
+
+    article.append(img, label, title, description);
+
+    if (extra.locked) {
+      article.classList.add("locked-extra");
+      article.append(createElement("strong", "locked", "guardado na gaveta"));
+    }
+
+    extrasList.append(article);
+  });
 }
 
 function renderMessages() {
@@ -94,18 +112,17 @@ function renderMessages() {
     article.dataset.id = message.id;
 
     const author = createElement("div", "message-author");
-    const emoji = createElement("span", null, message.emoji);
+    const avatar = createElement("span", "message-avatar", message.emoji);
     const name = createElement("strong", null, message.name);
-    author.append(emoji, name);
+    author.append(avatar, name);
 
-    const text = createElement("p", null, message.text);
     const date = createElement("time", "message-date", formatDate(message.createdAt));
     date.dateTime = message.createdAt;
-
-    const replyButton = createElement("button", "reply-button", "♡ responder");
+    const text = createElement("p", null, message.text);
+    const replyButton = createElement("button", "reply-button", "↩ responder");
     replyButton.type = "button";
 
-    article.append(author, text, date, replyButton);
+    article.append(author, date, text, replyButton);
 
     if (message.replies.length) {
       const replies = createElement("div", "replies");
@@ -140,7 +157,7 @@ function createReplyForm(messageId) {
   text.placeholder = "Responder com carinho...";
   text.required = true;
 
-  const button = createElement("button", "button ghost", "Enviar resposta");
+  const button = createElement("button", "button ghost", "enviar resposta");
   button.type = "submit";
 
   replyForm.append(name, text, button);
@@ -165,24 +182,19 @@ function closeWelcome() {
   document.body.classList.remove("welcome-open");
 }
 
-function applyTimeLight() {
-  const hour = new Date().getHours();
-  const light = hour >= 18 || hour < 6 ? "night" : hour >= 13 ? "afternoon" : "morning";
-  document.body.dataset.light = light;
-}
-
 function updateVisitSummary() {
   const previousVisit = localStorage.getItem(lastVisitKey);
+  const message = previousVisit
+    ? "Desde sua última visita, a barra avançou e chegaram novos bilhetes."
+    : "Primeira visita registrada. A escrivaninha já está esperando por você.";
 
-  if (previousVisit) {
-    visitSummary.textContent =
-      "Desde sua última visita, a barra avançou, chegaram novas cartas e Flora deixou um bilhete curto na escrivaninha.";
-  } else {
-    visitSummary.textContent =
-      "Primeira visita registrada. A escrivaninha já tem cartas, diário e uma gaveta de extras esperando por você.";
+  const ticket = document.querySelector(".pink-ticket");
+  if (ticket && !previousVisit) {
+    ticket.innerHTML = "obrigada por estar aqui!<br />você acabou de abrir a escrivaninha. ♡";
   }
 
   localStorage.setItem(lastVisitKey, new Date().toISOString());
+  return message;
 }
 
 emojiButtons.forEach((button) => {
@@ -195,12 +207,18 @@ emojiButtons.forEach((button) => {
 
 enterButton.addEventListener("click", closeWelcome);
 
+if (focusMessageButton) {
+  focusMessageButton.addEventListener("click", () => {
+    document.querySelector("#readerMessage").focus();
+  });
+}
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const data = new FormData(form);
   const nextMessage = {
-    id: crypto.randomUUID(),
+    id: createId(),
     emoji: data.get("emoji") || "🌷",
     name: String(data.get("name")).trim(),
     text: String(data.get("message")).trim(),
@@ -211,7 +229,7 @@ form.addEventListener("submit", (event) => {
   if (!nextMessage.name || !nextMessage.text) return;
 
   messages = [nextMessage, ...messages];
-  saveMessages();
+  saveMessages(messages);
   renderMessages();
   form.reset();
   readerEmoji.value = "🌷";
@@ -253,11 +271,13 @@ messageList.addEventListener("submit", (event) => {
   if (!reply.name || !reply.text) return;
 
   message.replies.push(reply);
-  saveMessages();
+  saveMessages(messages);
   renderMessages();
 });
 
-applyTimeLight();
+renderBook();
+renderDiary();
+renderExtras();
+renderMessages();
 showWelcomeIfNeeded();
 updateVisitSummary();
-renderMessages();
