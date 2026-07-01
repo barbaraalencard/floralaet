@@ -12,6 +12,7 @@ Primeira versão do site para leitoras, baseada no briefing do chat compartilhad
 - Dados salvos localmente no navegador usando `localStorage`.
 - Login em `login.html` e painel em `admin.html`.
 - Painel para atualizar progresso, publicar bilhetes, adicionar extras e responder ao mural.
+- Card lateral com playlist do Spotify, editável pelo painel.
 
 ## Como testar
 

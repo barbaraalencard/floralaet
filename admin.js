@@ -35,7 +35,9 @@ if (adminRoot) {
   const bookForm = document.querySelector("#bookForm");
   const diaryForm = document.querySelector("#diaryForm");
   const extraForm = document.querySelector("#extraForm");
+  const musicForm = document.querySelector("#musicForm");
   const bookStatus = document.querySelector("#bookStatus");
+  const musicStatus = document.querySelector("#musicStatus");
   const logoutButton = document.querySelector("#logoutButton");
   const diaryAdminList = document.querySelector("#diaryAdminList");
   const extrasAdminList = document.querySelector("#extrasAdminList");
@@ -60,6 +62,13 @@ if (adminRoot) {
     bookForm.elements.totalChapters.value = book.totalChapters;
     bookForm.elements.nextMilestone.value = book.nextMilestone;
     bookForm.elements.quote.value = book.quote;
+  }
+
+  function fillMusicForm() {
+    const music = state.music || {};
+    musicForm.elements.title.value = music.title || "no fone agora";
+    musicForm.elements.caption.value = music.caption || "playlist da Flora";
+    musicForm.elements.spotifyUrl.value = music.spotifyUrl || "";
   }
 
   function renderDiaryAdmin() {
@@ -191,6 +200,23 @@ if (adminRoot) {
     renderExtrasAdmin();
   });
 
+  musicForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(musicForm);
+
+    state.music = {
+      title: String(data.get("title")).trim(),
+      caption: String(data.get("caption")).trim(),
+      spotifyUrl: String(data.get("spotifyUrl")).trim(),
+    };
+
+    saveState(state);
+    musicStatus.textContent = "playlist salva na lateral.";
+    window.setTimeout(() => {
+      musicStatus.textContent = "";
+    }, 2600);
+  });
+
   diaryAdminList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-remove-diary]");
     if (!button) return;
@@ -232,6 +258,7 @@ if (adminRoot) {
   });
 
   fillBookForm();
+  fillMusicForm();
   renderDiaryAdmin();
   renderExtrasAdmin();
   renderAdminMessages();

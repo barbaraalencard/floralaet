@@ -20,6 +20,9 @@ const focusMessageButton = document.querySelector("#focusMessageButton");
 const diaryPreviewList = document.querySelector("#diaryPreviewList");
 const diaryFullList = document.querySelector("#diaryFullList");
 const extrasList = document.querySelector("#extrasList");
+const spotifyTitle = document.querySelector("#spotifyTitle");
+const spotifyEmbed = document.querySelector("#spotifyEmbed");
+const spotifyCaption = document.querySelector("#spotifyCaption");
 
 let messages = loadMessages();
 let siteState = loadState();
@@ -57,6 +60,25 @@ function renderBook() {
 
   const fill = document.querySelector("#progressFill");
   if (fill) fill.style.setProperty("--progress", `${progress}%`);
+}
+
+function toSpotifyEmbedUrl(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (raw.includes("open.spotify.com/embed/")) return raw;
+
+  const match = raw.match(/open\.spotify\.com\/(playlist|album|track)\/([A-Za-z0-9]+)/);
+  if (!match) return raw;
+
+  return `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=generator`;
+}
+
+function renderMusic() {
+  if (!spotifyEmbed || !siteState.music) return;
+
+  spotifyTitle.textContent = siteState.music.title || "no fone agora";
+  spotifyCaption.textContent = siteState.music.caption || "";
+  spotifyEmbed.src = toSpotifyEmbedUrl(siteState.music.spotifyUrl);
 }
 
 function renderDiary() {
@@ -276,6 +298,7 @@ messageList.addEventListener("submit", (event) => {
 });
 
 renderBook();
+renderMusic();
 renderDiary();
 renderExtras();
 renderMessages();

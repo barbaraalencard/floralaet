@@ -114,6 +114,32 @@
             </form>
             <div class="admin-list" id="extrasAdminList"></div>
           </section>
+
+          <section class="admin-card" aria-labelledby="musicAdminTitle">
+            <h2 id="musicAdminTitle">playlist lateral</h2>
+            <form class="admin-form" id="musicForm">
+              <label class="full">
+                <span>título do card</span>
+                <input name="title" required />
+              </label>
+              <label class="full">
+                <span>legenda</span>
+                <input name="caption" required />
+              </label>
+              <label class="full">
+                <span>link da playlist do Spotify</span>
+                <input
+                  name="spotifyUrl"
+                  placeholder="https://open.spotify.com/playlist/..."
+                  required
+                />
+              </label>
+              <div class="admin-actions">
+                <button class="button primary" type="submit">salvar playlist</button>
+                <p class="admin-status" id="musicStatus" role="status" aria-live="polite"></p>
+              </div>
+            </form>
+          </section>
         </div>
       </div>
     </main>

@@ -21,6 +21,11 @@
       nextMilestone: "capítulo 18",
       quote: '"Toda história tem seu tempo. A nossa está sendo escrita."',
     },
+    music: {
+      title: "no fone agora",
+      caption: "playlist provisória da escrivaninha",
+      spotifyUrl: "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator",
+    },
     diary: [
       {
         id: createId(),
@@ -115,6 +120,7 @@
       ...defaultState,
       ...stored,
       book: { ...defaultState.book, ...(stored && stored.book) },
+      music: { ...defaultState.music, ...(stored && stored.music) },
       diary: Array.isArray(stored && stored.diary) ? stored.diary : defaultState.diary,
       extras: Array.isArray(stored && stored.extras) ? stored.extras : defaultState.extras,
     };
