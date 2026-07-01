@@ -4,12 +4,60 @@
   const welcomeKey = "flora-skip-welcome";
   const lastVisitKey = "flora-last-visit";
   const adminSessionKey = "flora-admin-session";
-  const adminPassword = "flora2026";
+  const passwordKey = "flora-admin-password";
+  const defaultAdminPassword = "flora2026";
 
   function createId() {
     if (crypto && crypto.randomUUID) return crypto.randomUUID();
     return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   }
+
+  const defaultExtras = [
+    {
+      id: "ilustracoes",
+      label: "ilustrações",
+      title: "Ilustrações",
+      description: "Retratos, cantinhos e referências visuais do universo.",
+      content:
+        "Use esta página para reunir ilustrações oficiais, fanarts autorizadas e imagens de referência dos livros.",
+      image: "assets/escrivaninha-collage.png",
+      page: "extra-ilustracoes.html",
+      locked: false,
+    },
+    {
+      id: "mapas",
+      label: "mapas",
+      title: "Mapas",
+      description: "Locais importantes para acompanhar a jornada sem se perder.",
+      content:
+        "Aqui podem entrar mapas, rotas, casas, cidades e pequenos guias geográficos do universo dos livros.",
+      image: "assets/escrivaninha-collage.png",
+      page: "extra-mapas.html",
+      locked: false,
+    },
+    {
+      id: "arvore",
+      label: "árvore genealógica",
+      title: "Famílias",
+      description: "Conexões, sobrenomes e pequenos segredos sem spoilers grandes.",
+      content:
+        "Esta página fica reservada para árvores genealógicas, laços familiares e relações importantes.",
+      image: "assets/escrivaninha-collage.png",
+      page: "extra-arvore.html",
+      locked: false,
+    },
+    {
+      id: "cenas",
+      label: "cenas extras",
+      title: "Cenas extras",
+      description: "Bilhetes guardados para quando o manuscrito avançar mais.",
+      content:
+        "Guarde aqui cenas deletadas, cartas de personagens, capítulos bônus e pequenos presentes para as leitoras.",
+      image: "assets/escrivaninha-collage.png",
+      page: "extra-cenas.html",
+      locked: true,
+    },
+  ];
 
   const defaultState = {
     book: {
@@ -20,6 +68,10 @@
       totalChapters: 27,
       nextMilestone: "capítulo 18",
       quote: '"Toda história tem seu tempo. A nossa está sendo escrita."',
+    },
+    hero: {
+      image: "assets/escrivaninha-collage.png",
+      alt: "Colagem de papéis, fotos e objetos de escrita na escrivaninha",
     },
     music: {
       title: "no fone agora",
@@ -46,40 +98,23 @@
         text: "Descobri um novo lugar perfeito para uma cena importante. A pesquisa histórica é viciante.",
       },
     ],
-    extras: [
-      {
-        id: createId(),
-        label: "ilustrações",
-        title: "Ilustrações",
-        description: "Retratos, cantinhos e referências visuais do universo.",
+    extras: defaultExtras,
+    purchase: {
+      physical: {
+        title: "Livros físicos",
+        description: "Links para comprar os livros impressos da Flora.",
         image: "assets/escrivaninha-collage.png",
-        locked: false,
+        link: "https://example.com/livros-fisicos",
+        buttonLabel: "abrir livraria",
       },
-      {
-        id: createId(),
-        label: "mapas",
-        title: "Mapas",
-        description: "Locais importantes para acompanhar a jornada sem se perder.",
+      digital: {
+        title: "E-books",
+        description: "Links para comprar as versões digitais dos livros.",
         image: "assets/escrivaninha-collage.png",
-        locked: false,
+        link: "https://example.com/ebooks",
+        buttonLabel: "abrir loja digital",
       },
-      {
-        id: createId(),
-        label: "árvore genealógica",
-        title: "Famílias",
-        description: "Conexões, sobrenomes e pequenos segredos sem spoilers grandes.",
-        image: "assets/escrivaninha-collage.png",
-        locked: false,
-      },
-      {
-        id: createId(),
-        label: "cenas extras",
-        title: "Cenas extras",
-        description: "Bilhetes guardados para quando o manuscrito avançar mais.",
-        image: "assets/escrivaninha-collage.png",
-        locked: true,
-      },
-    ],
+    },
   };
 
   const defaultMessages = [
@@ -115,14 +150,34 @@
     },
   ];
 
+  function normalizeExtras(extras) {
+    const incoming = Array.isArray(extras) ? extras : [];
+
+    return defaultExtras.map((fallback, index) => {
+      const stored = incoming.find((item) => item.id === fallback.id) || incoming[index] || {};
+      return { ...fallback, ...stored, id: fallback.id, page: fallback.page };
+    });
+  }
+
   function mergeState(stored) {
     return {
       ...defaultState,
       ...stored,
       book: { ...defaultState.book, ...(stored && stored.book) },
+      hero: { ...defaultState.hero, ...(stored && stored.hero) },
       music: { ...defaultState.music, ...(stored && stored.music) },
+      purchase: {
+        physical: {
+          ...defaultState.purchase.physical,
+          ...(stored && stored.purchase && stored.purchase.physical),
+        },
+        digital: {
+          ...defaultState.purchase.digital,
+          ...(stored && stored.purchase && stored.purchase.digital),
+        },
+      },
       diary: Array.isArray(stored && stored.diary) ? stored.diary : defaultState.diary,
-      extras: Array.isArray(stored && stored.extras) ? stored.extras : defaultState.extras,
+      extras: normalizeExtras(stored && stored.extras),
     };
   }
 
@@ -136,7 +191,7 @@
   }
 
   function saveState(state) {
-    localStorage.setItem(stateKey, JSON.stringify(state));
+    localStorage.setItem(stateKey, JSON.stringify(mergeState(state)));
   }
 
   function loadMessages() {
@@ -152,16 +207,27 @@
     localStorage.setItem(messageKey, JSON.stringify(messages));
   }
 
+  function getAdminPassword() {
+    return localStorage.getItem(passwordKey) || defaultAdminPassword;
+  }
+
+  function setAdminPassword(password) {
+    localStorage.setItem(passwordKey, password);
+  }
+
   window.FloraData = {
-    adminPassword,
     adminSessionKey,
     createId,
+    defaultAdminPassword,
+    getAdminPassword,
     lastVisitKey,
     loadMessages,
     loadState,
     messageKey,
+    passwordKey,
     saveMessages,
     saveState,
+    setAdminPassword,
     stateKey,
     welcomeKey,
   };

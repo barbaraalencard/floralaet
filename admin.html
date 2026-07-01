@@ -60,6 +60,42 @@
             <h2 id="messagesAdminTitle">mural</h2>
             <div class="admin-list" id="adminMessages"></div>
           </section>
+
+          <section class="admin-card" aria-labelledby="heroAdminTitle">
+            <h2 id="heroAdminTitle">imagem inicial</h2>
+            <form class="admin-form" id="heroForm">
+              <label class="full">
+                <span>caminho ou link da imagem</span>
+                <input name="image" placeholder="assets/escrivaninha-collage.png" required />
+              </label>
+              <label class="full">
+                <span>descrição da imagem</span>
+                <input name="alt" required />
+              </label>
+              <div class="admin-actions">
+                <button class="button primary" type="submit">salvar imagem</button>
+                <p class="admin-status" id="heroStatus" role="status" aria-live="polite"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="admin-card" aria-labelledby="passwordAdminTitle">
+            <h2 id="passwordAdminTitle">alterar senha</h2>
+            <form class="admin-form" id="passwordForm">
+              <label>
+                <span>senha atual</span>
+                <input name="currentPassword" type="password" required />
+              </label>
+              <label>
+                <span>nova senha</span>
+                <input name="newPassword" type="password" minlength="4" required />
+              </label>
+              <div class="admin-actions">
+                <button class="button primary" type="submit">trocar senha</button>
+                <p class="admin-status" id="passwordStatus" role="status" aria-live="polite"></p>
+              </div>
+            </form>
+          </section>
         </div>
 
         <div>
@@ -86,33 +122,13 @@
           </section>
 
           <section class="admin-card" aria-labelledby="extrasAdminTitle">
-            <h2 id="extrasAdminTitle">novo extra</h2>
-            <form class="admin-form" id="extraForm">
-              <label>
-                <span>etiqueta</span>
-                <input name="label" placeholder="mapas" required />
-              </label>
-              <label>
-                <span>título</span>
-                <input name="title" required />
-              </label>
-              <label class="full">
-                <span>descrição</span>
-                <textarea name="description" rows="3" required></textarea>
-              </label>
-              <label class="full">
-                <span>imagem</span>
-                <input name="image" placeholder="assets/escrivaninha-collage.png" />
-              </label>
-              <label>
-                <span>guardado?</span>
-                <input name="locked" type="checkbox" />
-              </label>
-              <div class="admin-actions">
-                <button class="button primary" type="submit">publicar extra</button>
-              </div>
-            </form>
+            <h2 id="extrasAdminTitle">páginas de extras</h2>
             <div class="admin-list" id="extrasAdminList"></div>
+          </section>
+
+          <section class="admin-card" aria-labelledby="purchaseAdminTitle">
+            <h2 id="purchaseAdminTitle">onde comprar</h2>
+            <div class="admin-list" id="purchaseAdminList"></div>
           </section>
 
           <section class="admin-card" aria-labelledby="musicAdminTitle">

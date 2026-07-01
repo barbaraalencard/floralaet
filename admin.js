@@ -1,11 +1,12 @@
 const {
-  adminPassword,
   adminSessionKey,
   createId,
+  getAdminPassword,
   loadMessages,
   loadState,
   saveMessages,
   saveState,
+  setAdminPassword,
 } = window.FloraData;
 
 const loginForm = document.querySelector("#loginForm");
@@ -17,7 +18,7 @@ if (loginForm) {
     const password = String(new FormData(loginForm).get("password")).trim();
     const status = document.querySelector("#loginStatus");
 
-    if (password === adminPassword) {
+    if (password === getAdminPassword()) {
       sessionStorage.setItem(adminSessionKey, "true");
       window.location.href = "admin.html";
       return;
@@ -30,17 +31,25 @@ if (loginForm) {
 if (adminRoot) {
   if (sessionStorage.getItem(adminSessionKey) !== "true") {
     window.location.href = "login.html";
+  } else {
+    bootAdmin();
   }
+}
 
+function bootAdmin() {
   const bookForm = document.querySelector("#bookForm");
+  const heroForm = document.querySelector("#heroForm");
+  const passwordForm = document.querySelector("#passwordForm");
   const diaryForm = document.querySelector("#diaryForm");
-  const extraForm = document.querySelector("#extraForm");
   const musicForm = document.querySelector("#musicForm");
   const bookStatus = document.querySelector("#bookStatus");
+  const heroStatus = document.querySelector("#heroStatus");
+  const passwordStatus = document.querySelector("#passwordStatus");
   const musicStatus = document.querySelector("#musicStatus");
   const logoutButton = document.querySelector("#logoutButton");
   const diaryAdminList = document.querySelector("#diaryAdminList");
   const extrasAdminList = document.querySelector("#extrasAdminList");
+  const purchaseAdminList = document.querySelector("#purchaseAdminList");
   const adminMessages = document.querySelector("#adminMessages");
 
   let state = loadState();
@@ -53,6 +62,13 @@ if (adminRoot) {
     return element;
   }
 
+  function flash(element, message) {
+    element.textContent = message;
+    window.setTimeout(() => {
+      element.textContent = "";
+    }, 2600);
+  }
+
   function fillBookForm() {
     const book = state.book;
     bookForm.elements.title.value = book.title;
@@ -62,6 +78,11 @@ if (adminRoot) {
     bookForm.elements.totalChapters.value = book.totalChapters;
     bookForm.elements.nextMilestone.value = book.nextMilestone;
     bookForm.elements.quote.value = book.quote;
+  }
+
+  function fillHeroForm() {
+    heroForm.elements.image.value = state.hero.image;
+    heroForm.elements.alt.value = state.hero.alt;
   }
 
   function fillMusicForm() {
@@ -89,21 +110,98 @@ if (adminRoot) {
     });
   }
 
+  function buildTextInput(name, value, labelText, required = true) {
+    const label = createElement("label", "full");
+    const span = createElement("span", null, labelText);
+    const input = document.createElement("input");
+    input.name = name;
+    input.value = value || "";
+    input.required = required;
+    label.append(span, input);
+    return label;
+  }
+
+  function buildTextarea(name, value, labelText) {
+    const label = createElement("label", "full");
+    const span = createElement("span", null, labelText);
+    const textarea = document.createElement("textarea");
+    textarea.name = name;
+    textarea.rows = 4;
+    textarea.value = value || "";
+    textarea.required = true;
+    label.append(span, textarea);
+    return label;
+  }
+
   function renderExtrasAdmin() {
     extrasAdminList.replaceChildren();
 
     state.extras.forEach((extra) => {
       const article = createElement("article");
-      article.append(
-        createElement("h3", null, `${extra.label} · ${extra.title}`),
-        createElement("p", null, extra.description),
+      article.append(createElement("h3", null, extra.title));
+
+      const form = createElement("form", "admin-form");
+      form.dataset.extraId = extra.id;
+      form.append(
+        buildTextInput("label", extra.label, "etiqueta"),
+        buildTextInput("title", extra.title, "título"),
+        buildTextInput("image", extra.image, "capa da página"),
+        buildTextarea("description", extra.description, "descrição curta"),
+        buildTextarea("content", extra.content, "conteúdo da página"),
       );
 
-      const remove = createElement("button", "button ghost", "remover");
-      remove.type = "button";
-      remove.dataset.removeExtra = extra.id;
-      article.append(remove);
+      const lockedLabel = createElement("label");
+      const lockedText = createElement("span", null, "guardado?");
+      const locked = document.createElement("input");
+      locked.type = "checkbox";
+      locked.name = "locked";
+      locked.checked = Boolean(extra.locked);
+      lockedLabel.append(lockedText, locked);
+
+      const actions = createElement("div", "admin-actions");
+      const save = createElement("button", "button primary", "salvar página");
+      save.type = "submit";
+      const open = createElement("a", "button ghost", "abrir página");
+      open.href = extra.page;
+      actions.append(save, open);
+
+      form.append(lockedLabel, actions);
+      article.append(form);
       extrasAdminList.append(article);
+    });
+  }
+
+  function renderPurchaseAdmin() {
+    purchaseAdminList.replaceChildren();
+
+    [
+      { id: "physical", title: "Livros físicos", page: "comprar-fisicos.html" },
+      { id: "digital", title: "E-books", page: "comprar-digitais.html" },
+    ].forEach((item) => {
+      const data = state.purchase[item.id];
+      const article = createElement("article");
+      article.append(createElement("h3", null, item.title));
+
+      const form = createElement("form", "admin-form");
+      form.dataset.purchaseId = item.id;
+      form.append(
+        buildTextInput("title", data.title, "título"),
+        buildTextInput("image", data.image, "capa da página"),
+        buildTextInput("link", data.link, "link de compra"),
+        buildTextInput("buttonLabel", data.buttonLabel, "texto do botão"),
+        buildTextarea("description", data.description, "descrição"),
+      );
+
+      const actions = createElement("div", "admin-actions");
+      const save = createElement("button", "button primary", "salvar compra");
+      save.type = "submit";
+      const open = createElement("a", "button ghost", "abrir página");
+      open.href = item.page;
+      actions.append(save, open);
+      form.append(actions);
+
+      article.append(form);
+      purchaseAdminList.append(article);
     });
   }
 
@@ -154,10 +252,36 @@ if (adminRoot) {
     };
 
     saveState(state);
-    bookStatus.textContent = "progresso salvo na escrivaninha.";
-    window.setTimeout(() => {
-      bookStatus.textContent = "";
-    }, 2600);
+    flash(bookStatus, "progresso salvo na escrivaninha.");
+  });
+
+  heroForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(heroForm);
+
+    state.hero = {
+      image: String(data.get("image")).trim(),
+      alt: String(data.get("alt")).trim(),
+    };
+
+    saveState(state);
+    flash(heroStatus, "imagem inicial salva.");
+  });
+
+  passwordForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(passwordForm);
+    const currentPassword = String(data.get("currentPassword")).trim();
+    const newPassword = String(data.get("newPassword")).trim();
+
+    if (currentPassword !== getAdminPassword()) {
+      flash(passwordStatus, "senha atual incorreta.");
+      return;
+    }
+
+    setAdminPassword(newPassword);
+    passwordForm.reset();
+    flash(passwordStatus, "senha alterada com sucesso.");
   });
 
   diaryForm.addEventListener("submit", (event) => {
@@ -179,27 +303,6 @@ if (adminRoot) {
     renderDiaryAdmin();
   });
 
-  extraForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(extraForm);
-
-    state.extras = [
-      {
-        id: createId(),
-        label: String(data.get("label")).trim(),
-        title: String(data.get("title")).trim(),
-        description: String(data.get("description")).trim(),
-        image: String(data.get("image")).trim() || "assets/escrivaninha-collage.png",
-        locked: data.get("locked") === "on",
-      },
-      ...state.extras,
-    ];
-
-    saveState(state);
-    extraForm.reset();
-    renderExtrasAdmin();
-  });
-
   musicForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = new FormData(musicForm);
@@ -211,10 +314,46 @@ if (adminRoot) {
     };
 
     saveState(state);
-    musicStatus.textContent = "playlist salva na lateral.";
-    window.setTimeout(() => {
-      musicStatus.textContent = "";
-    }, 2600);
+    flash(musicStatus, "playlist salva na lateral.");
+  });
+
+  extrasAdminList.addEventListener("submit", (event) => {
+    const form = event.target.closest("form[data-extra-id]");
+    if (!form) return;
+
+    event.preventDefault();
+    const data = new FormData(form);
+    const extra = state.extras.find((item) => item.id === form.dataset.extraId);
+    if (!extra) return;
+
+    extra.label = String(data.get("label")).trim();
+    extra.title = String(data.get("title")).trim();
+    extra.image = String(data.get("image")).trim();
+    extra.description = String(data.get("description")).trim();
+    extra.content = String(data.get("content")).trim();
+    extra.locked = data.get("locked") === "on";
+
+    saveState(state);
+    renderExtrasAdmin();
+  });
+
+  purchaseAdminList.addEventListener("submit", (event) => {
+    const form = event.target.closest("form[data-purchase-id]");
+    if (!form) return;
+
+    event.preventDefault();
+    const data = new FormData(form);
+    const purchase = state.purchase[form.dataset.purchaseId];
+    if (!purchase) return;
+
+    purchase.title = String(data.get("title")).trim();
+    purchase.image = String(data.get("image")).trim();
+    purchase.link = String(data.get("link")).trim();
+    purchase.buttonLabel = String(data.get("buttonLabel")).trim();
+    purchase.description = String(data.get("description")).trim();
+
+    saveState(state);
+    renderPurchaseAdmin();
   });
 
   diaryAdminList.addEventListener("click", (event) => {
@@ -223,14 +362,6 @@ if (adminRoot) {
     state.diary = state.diary.filter((note) => note.id !== button.dataset.removeDiary);
     saveState(state);
     renderDiaryAdmin();
-  });
-
-  extrasAdminList.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-remove-extra]");
-    if (!button) return;
-    state.extras = state.extras.filter((extra) => extra.id !== button.dataset.removeExtra);
-    saveState(state);
-    renderExtrasAdmin();
   });
 
   adminMessages.addEventListener("submit", (event) => {
@@ -258,8 +389,10 @@ if (adminRoot) {
   });
 
   fillBookForm();
+  fillHeroForm();
   fillMusicForm();
   renderDiaryAdmin();
   renderExtrasAdmin();
+  renderPurchaseAdmin();
   renderAdminMessages();
 }

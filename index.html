@@ -15,6 +15,12 @@
       <div class="welcome-paper">
         <span class="pin pin-one" aria-hidden="true"></span>
         <span class="pin pin-two" aria-hidden="true"></span>
+        <div class="feather-writing" aria-hidden="true">
+          <span class="feather-mark">✒</span>
+          <svg viewBox="0 0 260 44" role="img">
+            <path d="M8 26 C42 8, 68 38, 98 22 S153 18, 178 29 S224 33, 252 15" />
+          </svg>
+        </div>
         <p class="stamp">arquivo pessoal</p>
         <h1>
           <span>bem-vinda ao</span>
@@ -48,6 +54,7 @@
           <a href="#diario"><span aria-hidden="true">☕</span> diário</a>
           <a href="#extras"><span aria-hidden="true">☆</span> extras</a>
           <a href="#mural"><span aria-hidden="true">☏</span> mural</a>
+          <a href="#comprar"><span aria-hidden="true">◇</span> adquirir livros</a>
           <a href="login.html"><span aria-hidden="true">♡</span> área da flora</a>
         </nav>
 
@@ -64,7 +71,7 @@
         </section>
 
         <div class="rail-note">
-          <span>lembrete da flora:</span>
+          <span>lembrete</span>
           <p>você não precisa ter tudo hoje. basta um capítulo de cada vez.</p>
         </div>
       </aside>
@@ -82,16 +89,16 @@
             <div class="welcome-copy">
               <span class="sparkle" aria-hidden="true">✧</span>
               <h1 id="heroTitle">
-                bem-vinda ao<br />
-                universo de<br />
-                <span>Flora Laet</span>
+                bem-vinda<br />
+                ao meu<br />
+                <span>QG</span>
               </h1>
-              <p>aqui, cada história ganha vida e você faz parte dessa jornada.</p>
               <span class="doodle-heart" aria-hidden="true">♡</span>
             </div>
 
             <figure class="hero-photo">
               <img
+                id="heroImage"
                 src="assets/escrivaninha-collage.png"
                 alt="Colagem de papéis, fotos e objetos de escrita na escrivaninha"
               />
@@ -125,11 +132,10 @@
               </dl>
             </article>
 
-            <aside class="diary-preview" aria-labelledby="diaryPreviewTitle">
-              <h2 id="diaryPreviewTitle">diário da flora ❀</h2>
+            <aside class="diary-preview" id="diario" aria-labelledby="diaryPreviewTitle">
+              <h2 id="diaryPreviewTitle">diário ❀</h2>
               <p>pensamentos, desabafos e devaneios de uma escritora.</p>
               <div class="diary-preview-list" id="diaryPreviewList"></div>
-              <a href="#diario">ver todos os bilhetes →</a>
             </aside>
           </section>
 
@@ -142,7 +148,6 @@
             <div class="section-title-row">
               <div>
                 <h2 id="muralTitle">mural dos leitores</h2>
-                <p>deixe sua mensagem para mim e para outros leitores!</p>
               </div>
               <button class="button tape-button" type="button" id="focusMessageButton">
                 ✎ escrever mensagem
@@ -209,14 +214,14 @@
             <div class="extras-grid" id="extrasList"></div>
           </section>
 
-          <section class="paper-section diary-full" id="diario" aria-labelledby="diaryTitle">
+          <section class="paper-section buy-section" id="comprar" aria-labelledby="buyTitle">
             <div class="section-title-row">
               <div>
-                <h2 id="diaryTitle">diário da flora</h2>
-                <p>bilhetes curtinhos para quem gosta dos bastidores.</p>
+                <h2 id="buyTitle">onde comprar</h2>
+                <p>escolha entre livros físicos e digitais.</p>
               </div>
             </div>
-            <div class="notes-stream" id="diaryFullList"></div>
+            <div class="buy-grid" id="buyList"></div>
           </section>
 
           <section class="newsletter-card">

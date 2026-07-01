@@ -8,6 +8,8 @@
   --rose: #df7d9b;
   --rose-soft: #f5c6cf;
   --rose-paper: #f3aeba;
+  --lilac: #e7d9f3;
+  --lilac-deep: #d8c2ea;
   --sage: #8a9c88;
   --gold: #cf9e55;
   --line: rgba(24, 21, 22, 0.14);
@@ -15,6 +17,7 @@
   --shadow: 0 18px 48px rgba(49, 31, 24, 0.12);
   --mono: "Courier New", Courier, monospace;
   --hand: "Segoe Print", "Bradley Hand ITC", "Comic Sans MS", cursive;
+  --serif: "Bodoni 72", "Bodoni MT", Didot, Georgia, serif;
 }
 
 * {
@@ -85,6 +88,40 @@ img {
   background: rgba(255, 250, 242, 0.96);
   box-shadow: var(--shadow);
   transform: rotate(-1deg);
+}
+
+.feather-writing {
+  position: relative;
+  height: 50px;
+  margin: -10px 0 18px;
+}
+
+.feather-writing svg {
+  position: absolute;
+  inset: 8px 0 auto 34px;
+  width: min(260px, 88%);
+  height: 44px;
+  overflow: visible;
+}
+
+.feather-writing path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 330;
+  stroke-dashoffset: 330;
+  animation: writeLine 2.4s ease forwards;
+}
+
+.feather-mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  font-size: 2rem;
+  transform: rotate(-20deg);
+  animation: featherMove 2.4s ease forwards;
 }
 
 .welcome-paper::before,
@@ -189,12 +226,13 @@ img {
 .script-logo {
   display: inline-block;
   color: var(--ink);
-  font-family: var(--hand);
-  font-size: 3.05rem;
-  font-weight: 700;
-  line-height: 0.92;
+  font-family: var(--serif);
+  font-size: 2.85rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 0.98;
   text-decoration: none;
-  transform: rotate(-8deg);
+  transform: rotate(-4deg);
 }
 
 .rail-bio {
@@ -217,6 +255,7 @@ img {
   min-height: 30px;
   padding: 4px 12px;
   border-radius: 3px;
+  background: var(--lilac);
   font-weight: 700;
   text-decoration: none;
 }
@@ -224,7 +263,7 @@ img {
 .rail-nav a.active,
 .rail-nav a:hover,
 .rail-nav a:focus-visible {
-  background: var(--rose-soft);
+  background: var(--lilac-deep);
   outline: none;
 }
 
@@ -468,10 +507,11 @@ img {
 }
 
 .progress-sheet h2 {
+  font-family: var(--serif);
   margin: 22px 0 22px;
   max-width: 14ch;
   font-size: clamp(1.65rem, 2.3vw, 2.3rem);
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.3;
 }
 
@@ -575,7 +615,7 @@ img {
 .diary-note,
 .note-card {
   padding: 16px;
-  background: rgba(255, 245, 232, 0.86);
+  background: rgba(231, 217, 243, 0.78);
   box-shadow: 0 8px 20px rgba(49, 31, 24, 0.08);
 }
 
@@ -642,7 +682,7 @@ img {
   border: 1px solid var(--ink);
   border-radius: 6px;
   color: var(--ink);
-  background: transparent;
+  background: var(--lilac);
   cursor: pointer;
   font-weight: 700;
   text-decoration: none;
@@ -657,17 +697,17 @@ img {
 }
 
 .button.primary {
-  color: #fffaf2;
-  background: var(--ink);
+  color: var(--ink);
+  background: var(--lilac-deep);
 }
 
 .button.ghost {
-  background: rgba(255, 250, 242, 0.76);
+  background: var(--lilac);
 }
 
 .tape-button {
   border: 0;
-  background: var(--rose-soft);
+  background: var(--lilac);
   transform: rotate(-1.5deg);
 }
 
@@ -750,6 +790,8 @@ textarea:focus {
   border-radius: 6px;
   background: rgba(255, 250, 242, 0.78);
   box-shadow: 0 9px 24px rgba(49, 31, 24, 0.07);
+  color: inherit;
+  text-decoration: none;
 }
 
 .message-author {
@@ -804,18 +846,27 @@ textarea:focus {
   display: grid;
 }
 
-.extras-grid {
+.extras-grid,
+.buy-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
-.extra-card {
+.extra-card,
+.buy-card {
+  color: inherit;
+  text-decoration: none;
   min-height: 205px;
   padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 250, 242, 0.78);
+  box-shadow: 0 9px 24px rgba(49, 31, 24, 0.07);
 }
 
-.extra-card img {
+.extra-card img,
+.buy-card img {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -833,12 +884,14 @@ textarea:focus {
   z-index: 1;
 }
 
-.extra-card h3 {
+.extra-card h3,
+.buy-card h3 {
   margin: 2px 8px 6px;
   font-size: 1rem;
 }
 
 .extra-card p,
+.buy-card p,
 .locked {
   margin: 0 8px 8px;
   color: var(--muted);
@@ -1083,6 +1136,7 @@ textarea:focus {
 
   .message-grid,
   .extras-grid,
+  .buy-grid,
   .notes-stream,
   .newsletter-card {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1120,6 +1174,7 @@ textarea:focus {
   .topline,
   .message-grid,
   .extras-grid,
+  .buy-grid,
   .notes-stream,
   .newsletter-card,
   .newsletter-card form,
@@ -1171,5 +1226,26 @@ textarea:focus {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+@keyframes writeLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes featherMove {
+  0% {
+    transform: translate(0, 0) rotate(-22deg);
+  }
+  35% {
+    transform: translate(86px, 20px) rotate(-15deg);
+  }
+  70% {
+    transform: translate(172px, 16px) rotate(-18deg);
+  }
+  100% {
+    transform: translate(238px, 3px) rotate(-15deg);
   }
 }

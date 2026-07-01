@@ -18,8 +18,9 @@ const readerEmoji = document.querySelector("#readerEmoji");
 const emojiButtons = document.querySelectorAll(".emoji-option");
 const focusMessageButton = document.querySelector("#focusMessageButton");
 const diaryPreviewList = document.querySelector("#diaryPreviewList");
-const diaryFullList = document.querySelector("#diaryFullList");
 const extrasList = document.querySelector("#extrasList");
+const buyList = document.querySelector("#buyList");
+const heroImage = document.querySelector("#heroImage");
 const spotifyTitle = document.querySelector("#spotifyTitle");
 const spotifyEmbed = document.querySelector("#spotifyEmbed");
 const spotifyCaption = document.querySelector("#spotifyCaption");
@@ -62,6 +63,13 @@ function renderBook() {
   if (fill) fill.style.setProperty("--progress", `${progress}%`);
 }
 
+function renderHero() {
+  if (!heroImage || !siteState.hero) return;
+
+  heroImage.src = siteState.hero.image || "assets/escrivaninha-collage.png";
+  heroImage.alt = siteState.hero.alt || "Imagem escolhida pela Flora para a página inicial";
+}
+
 function toSpotifyEmbedUrl(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
@@ -83,7 +91,6 @@ function renderMusic() {
 
 function renderDiary() {
   diaryPreviewList.replaceChildren();
-  diaryFullList.replaceChildren();
 
   siteState.diary.slice(0, 3).forEach((note) => {
     const card = createElement("article", "diary-note");
@@ -92,21 +99,15 @@ function renderDiary() {
     card.append(stamp, text);
     diaryPreviewList.append(card);
   });
-
-  siteState.diary.forEach((note) => {
-    const card = createElement("article", "note-card");
-    const stamp = createElement("time", null, `${note.date} · ${note.time}`);
-    const text = createElement("p", null, note.text);
-    card.append(stamp, text);
-    diaryFullList.append(card);
-  });
 }
 
 function renderExtras() {
   extrasList.replaceChildren();
 
   siteState.extras.forEach((extra) => {
-    const article = createElement("article", "extra-card");
+    const article = document.createElement("a");
+    article.className = "extra-card";
+    article.href = extra.page || "#";
     const img = document.createElement("img");
     img.src = extra.image || "assets/escrivaninha-collage.png";
     img.alt = "";
@@ -123,6 +124,33 @@ function renderExtras() {
     }
 
     extrasList.append(article);
+  });
+}
+
+function renderBuyLinks() {
+  if (!buyList || !siteState.purchase) return;
+
+  buyList.replaceChildren();
+
+  [
+    { key: "physical", label: "físicos" },
+    { key: "digital", label: "digitais" },
+  ].forEach((item) => {
+    const data = siteState.purchase[item.key];
+    const card = document.createElement("a");
+    card.className = "buy-card";
+    card.href = item.key === "physical" ? "comprar-fisicos.html" : "comprar-digitais.html";
+
+    const img = document.createElement("img");
+    img.src = data.image || "assets/escrivaninha-collage.png";
+    img.alt = "";
+
+    const label = createElement("span", "extra-label", item.label);
+    const title = createElement("h3", null, data.title);
+    const description = createElement("p", null, data.description);
+
+    card.append(img, label, title, description);
+    buyList.append(card);
   });
 }
 
@@ -298,9 +326,11 @@ messageList.addEventListener("submit", (event) => {
 });
 
 renderBook();
+renderHero();
 renderMusic();
 renderDiary();
 renderExtras();
+renderBuyLinks();
 renderMessages();
 showWelcomeIfNeeded();
 updateVisitSummary();
