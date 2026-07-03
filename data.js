@@ -8,8 +8,18 @@
   const defaultAdminPassword = "flora2026";
 
   function createId() {
-    if (crypto && crypto.randomUUID) return crypto.randomUUID();
+    if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
     return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  function defaultExtraItem(id, title, description, content) {
+    return {
+      id,
+      title,
+      description,
+      content,
+      image: "assets/escrivaninha-collage.png",
+    };
   }
 
   const defaultExtras = [
@@ -23,6 +33,14 @@
       image: "assets/escrivaninha-collage.png",
       page: "extra-ilustracoes.html",
       locked: false,
+      items: [
+        defaultExtraItem(
+          "ilustracoes-1",
+          "Primeira inspiração",
+          "Um cantinho visual para abrir a galeria.",
+          "Substitua este item pela primeira ilustração oficial quando quiser.",
+        ),
+      ],
     },
     {
       id: "mapas",
@@ -34,6 +52,14 @@
       image: "assets/escrivaninha-collage.png",
       page: "extra-mapas.html",
       locked: false,
+      items: [
+        defaultExtraItem(
+          "mapas-1",
+          "Mapa em preparação",
+          "Um espaço reservado para o primeiro mapa do universo.",
+          "Cadastre aqui mapas, rotas e lugares importantes quando estiverem prontos.",
+        ),
+      ],
     },
     {
       id: "arvore",
@@ -45,6 +71,14 @@
       image: "assets/escrivaninha-collage.png",
       page: "extra-arvore.html",
       locked: false,
+      items: [
+        defaultExtraItem(
+          "arvore-1",
+          "Primeira família",
+          "O primeiro painel familiar pode entrar aqui.",
+          "Adicione imagens, resumos e observações sobre personagens e linhagens.",
+        ),
+      ],
     },
     {
       id: "cenas",
@@ -56,6 +90,14 @@
       image: "assets/escrivaninha-collage.png",
       page: "extra-cenas.html",
       locked: true,
+      items: [
+        defaultExtraItem(
+          "cenas-1",
+          "Cena guardada",
+          "Um espaço reservado para a primeira cena extra.",
+          "Quando chegar a hora, publique aqui uma cena, carta ou capítulo bônus.",
+        ),
+      ],
     },
   ];
 
@@ -72,6 +114,16 @@
     hero: {
       image: "assets/escrivaninha-collage.png",
       alt: "Colagem de papéis, fotos e objetos de escrita na escrivaninha",
+      sideImages: [
+        {
+          image: "assets/hero-side-1.png",
+          alt: "Detalhe delicado de papéis e rabiscos da escrivaninha",
+        },
+        {
+          image: "assets/hero-side-2.png",
+          alt: "Detalhe de anotações e flores em clima de romance",
+        },
+      ],
     },
     music: {
       title: "no fone agora",
@@ -104,15 +156,31 @@
         title: "Livros físicos",
         description: "Links para comprar os livros impressos da Flora.",
         image: "assets/escrivaninha-collage.png",
-        link: "https://example.com/livros-fisicos",
-        buttonLabel: "abrir livraria",
+        items: [
+          {
+            id: "fisicos-1",
+            title: "Livro físico 1",
+            description: "Edite este card com o nome, capa e link do livro físico.",
+            image: "assets/escrivaninha-collage.png",
+            link: "https://example.com/livros-fisicos",
+            buttonLabel: "comprar físico",
+          },
+        ],
       },
       digital: {
         title: "E-books",
         description: "Links para comprar as versões digitais dos livros.",
         image: "assets/escrivaninha-collage.png",
-        link: "https://example.com/ebooks",
-        buttonLabel: "abrir loja digital",
+        items: [
+          {
+            id: "digitais-1",
+            title: "E-book 1",
+            description: "Edite este card com o nome, capa e link do e-book.",
+            image: "assets/escrivaninha-collage.png",
+            link: "https://example.com/ebooks",
+            buttonLabel: "comprar e-book",
+          },
+        ],
       },
     },
   };
@@ -150,13 +218,92 @@
     },
   ];
 
+  function normalizeExtraItems(items, fallbackItems) {
+    const incoming = Array.isArray(items) ? items : fallbackItems;
+
+    return incoming.map((item) => ({
+      id: item.id || createId(),
+      title: item.title || "Novo conteúdo",
+      description: item.description || "",
+      content: item.content || "",
+      image: item.image || "assets/escrivaninha-collage.png",
+    }));
+  }
+
   function normalizeExtras(extras) {
     const incoming = Array.isArray(extras) ? extras : [];
 
     return defaultExtras.map((fallback, index) => {
       const stored = incoming.find((item) => item.id === fallback.id) || incoming[index] || {};
-      return { ...fallback, ...stored, id: fallback.id, page: fallback.page };
+      return {
+        ...fallback,
+        ...stored,
+        id: fallback.id,
+        page: fallback.page,
+        items: normalizeExtraItems(stored.items, fallback.items),
+      };
     });
+  }
+
+  function normalizePurchaseItems(storedData, fallbackData) {
+    if (Array.isArray(storedData.items)) {
+      return storedData.items.map((item) => ({
+        id: item.id || createId(),
+        title: item.title || "Novo livro",
+        description: item.description || "",
+        image: item.image || "assets/escrivaninha-collage.png",
+        link: item.link || "#",
+        buttonLabel: item.buttonLabel || "comprar",
+      }));
+    }
+
+    if (storedData.link) {
+      return [
+        {
+          id: createId(),
+          title: storedData.title || fallbackData.title,
+          description: storedData.description || fallbackData.description,
+          image: storedData.image || fallbackData.image,
+          link: storedData.link,
+          buttonLabel: storedData.buttonLabel || "comprar",
+        },
+      ];
+    }
+
+    return fallbackData.items.map((item) => ({ ...item }));
+  }
+
+  function normalizePurchaseCategory(stored, key) {
+    const fallback = defaultState.purchase[key];
+    const storedData = (stored && stored.purchase && stored.purchase[key]) || {};
+
+    return {
+      ...fallback,
+      ...storedData,
+      title: storedData.title || fallback.title,
+      description: storedData.description || fallback.description,
+      image: storedData.image || fallback.image,
+      items: normalizePurchaseItems(storedData, fallback),
+    };
+  }
+
+  function normalizeHero(stored) {
+    const storedHero = (stored && stored.hero) || {};
+    const fallbackSideImages = defaultState.hero.sideImages;
+    const incomingSideImages = Array.isArray(storedHero.sideImages) ? storedHero.sideImages : [];
+
+    return {
+      ...defaultState.hero,
+      ...storedHero,
+      image: storedHero.image || defaultState.hero.image,
+      alt: storedHero.alt || defaultState.hero.alt,
+      sideImages: fallbackSideImages.map((fallback, index) => ({
+        ...fallback,
+        ...(incomingSideImages[index] || {}),
+        image: (incomingSideImages[index] && incomingSideImages[index].image) || fallback.image,
+        alt: (incomingSideImages[index] && incomingSideImages[index].alt) || fallback.alt,
+      })),
+    };
   }
 
   function mergeState(stored) {
@@ -164,17 +311,11 @@
       ...defaultState,
       ...stored,
       book: { ...defaultState.book, ...(stored && stored.book) },
-      hero: { ...defaultState.hero, ...(stored && stored.hero) },
+      hero: normalizeHero(stored),
       music: { ...defaultState.music, ...(stored && stored.music) },
       purchase: {
-        physical: {
-          ...defaultState.purchase.physical,
-          ...(stored && stored.purchase && stored.purchase.physical),
-        },
-        digital: {
-          ...defaultState.purchase.digital,
-          ...(stored && stored.purchase && stored.purchase.digital),
-        },
+        physical: normalizePurchaseCategory(stored, "physical"),
+        digital: normalizePurchaseCategory(stored, "digital"),
       },
       diary: Array.isArray(stored && stored.diary) ? stored.diary : defaultState.diary,
       extras: normalizeExtras(stored && stored.extras),

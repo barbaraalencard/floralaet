@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Painel da Flora</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260702i" />
   </head>
   <body class="admin-page">
     <main class="admin-shell" id="adminRoot">
@@ -62,18 +62,34 @@
           </section>
 
           <section class="admin-card" aria-labelledby="heroAdminTitle">
-            <h2 id="heroAdminTitle">imagem inicial</h2>
+            <h2 id="heroAdminTitle">imagens iniciais</h2>
             <form class="admin-form" id="heroForm">
               <label class="full">
-                <span>caminho ou link da imagem</span>
+                <span>colagem principal</span>
                 <input name="image" placeholder="assets/escrivaninha-collage.png" required />
               </label>
               <label class="full">
-                <span>descrição da imagem</span>
+                <span>descrição da colagem principal</span>
                 <input name="alt" required />
               </label>
+              <label class="full">
+                <span>imagem lateral 1</span>
+                <input name="sideImageOne" placeholder="assets/hero-side-1.png" required />
+              </label>
+              <label class="full">
+                <span>descrição da imagem lateral 1</span>
+                <input name="sideAltOne" required />
+              </label>
+              <label class="full">
+                <span>imagem lateral 2</span>
+                <input name="sideImageTwo" placeholder="assets/hero-side-2.png" required />
+              </label>
+              <label class="full">
+                <span>descrição da imagem lateral 2</span>
+                <input name="sideAltTwo" required />
+              </label>
               <div class="admin-actions">
-                <button class="button primary" type="submit">salvar imagem</button>
+                <button class="button primary" type="submit">salvar imagens</button>
                 <p class="admin-status" id="heroStatus" role="status" aria-live="polite"></p>
               </div>
             </form>
@@ -160,7 +176,7 @@
       </div>
     </main>
 
-    <script src="data.js"></script>
-    <script src="admin.js"></script>
+    <script src="data.js?v=20260702g"></script>
+    <script src="admin.js?v=20260702g"></script>
   </body>
 </html>

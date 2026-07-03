@@ -8,23 +8,17 @@
       name="description"
       content="Um cantinho acolhedor para leitoras acompanharem a escrita, deixarem cartas e descobrirem extras do universo de Flora Laet."
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260702i" />
   </head>
   <body>
     <div class="welcome-screen" id="welcomeScreen" aria-label="Boas-vindas">
       <div class="welcome-paper">
-        <span class="pin pin-one" aria-hidden="true"></span>
-        <span class="pin pin-two" aria-hidden="true"></span>
-        <div class="feather-writing" aria-hidden="true">
-          <span class="feather-mark">✒</span>
-          <svg viewBox="0 0 260 44" role="img">
-            <path d="M8 26 C42 8, 68 38, 98 22 S153 18, 178 29 S224 33, 252 15" />
-          </svg>
-        </div>
-        <p class="stamp">arquivo pessoal</p>
         <h1>
-          <span>bem-vinda ao</span>
-          <strong>meu<br />QG</strong>
+          <span class="welcome-script-line">
+            <span class="welcome-script-text">bem-vinda ao</span>
+            <img class="feather-mark" src="assets/pena.png" alt="" aria-hidden="true" />
+          </span>
+          <strong>universo da Flora</strong>
         </h1>
         <p>A escrivaninha está aberta. Entre devagarinho.</p>
         <div class="welcome-actions">
@@ -34,7 +28,7 @@
           </button>
           <label class="remember-choice">
             <input id="skipWelcome" type="checkbox" />
-            Não mostrar novamente
+            <span>Não mostrar novamente</span>
           </label>
         </div>
       </div>
@@ -45,17 +39,15 @@
         <a class="script-logo" href="#inicio" aria-label="Início do Cantinho da Flora">
           Flora<br />Laet
         </a>
-        <p class="rail-bio">
-          escritora de histórias apaixonantes e finais que valem a espera.
-        </p>
+        <p class="rail-bio">escrevendo romances para fãs de amores caóticos.</p>
 
         <nav class="rail-nav">
-          <a class="active" href="#inicio"><span aria-hidden="true">⌂</span> início</a>
-          <a href="#diario"><span aria-hidden="true">☕</span> diário</a>
-          <a href="#extras"><span aria-hidden="true">☆</span> extras</a>
-          <a href="#mural"><span aria-hidden="true">☏</span> mural</a>
-          <a href="#comprar"><span aria-hidden="true">◇</span> adquirir livros</a>
-          <a href="login.html"><span aria-hidden="true">♡</span> área da flora</a>
+          <a class="active" href="#inicio"><img class="nav-icon" src="assets/icon-inicio.png" alt="" aria-hidden="true" /> início</a>
+          <a href="#diario"><img class="nav-icon" src="assets/icon-diario.png" alt="" aria-hidden="true" /> diário</a>
+          <a href="#extras"><img class="nav-icon" src="assets/icon-extras.png" alt="" aria-hidden="true" /> extras</a>
+          <a href="#mural"><img class="nav-icon" src="assets/icon-mural.png" alt="" aria-hidden="true" /> mural</a>
+          <a href="#comprar"><img class="nav-icon" src="assets/icon-livros.png" alt="" aria-hidden="true" /> adquirir livros</a>
+          <a href="login.html"><img class="nav-icon" src="assets/icon-flora.png" alt="" aria-hidden="true" /> área da flora</a>
         </nav>
 
         <section class="spotify-card" aria-labelledby="spotifyTitle">
@@ -77,32 +69,40 @@
       </aside>
 
       <div class="main-board">
-        <header class="topline">
-          <p><span>oi, leitora!</span> ✨</p>
-          <p>que bom ter você aqui.</p>
-          <p>este é nosso cantinho.</p>
-          <a href="login.html" aria-label="Entrar na área da Flora">buscar...</a>
-        </header>
-
         <main id="inicio">
           <section class="hero-board" aria-labelledby="heroTitle">
             <div class="welcome-copy">
-              <span class="sparkle" aria-hidden="true">✧</span>
               <h1 id="heroTitle">
-                bem-vinda<br />
-                ao meu<br />
-                <span>QG</span>
+                <span>Oi<span class="sparkle" aria-hidden="true">✧</span> leitora,</span>
+                <strong>que bom te ver aqui</strong>
               </h1>
-              <span class="doodle-heart" aria-hidden="true">♡</span>
             </div>
 
-            <figure class="hero-photo">
-              <img
-                id="heroImage"
-                src="assets/escrivaninha-collage.png"
-                alt="Colagem de papéis, fotos e objetos de escrita na escrivaninha"
-              />
-            </figure>
+            <div class="hero-gallery" aria-label="Imagens da página inicial">
+              <figure class="hero-photo hero-photo-main">
+                <img
+                  id="heroImage"
+                  src="assets/escrivaninha-collage.png"
+                  alt="Colagem de papéis, fotos e objetos de escrita na escrivaninha"
+                />
+              </figure>
+              <div class="hero-side-photos">
+                <figure class="hero-photo hero-photo-small">
+                  <img
+                    id="heroSideImageOne"
+                    src="assets/hero-side-1.png"
+                    alt="Detalhe delicado de papéis e rabiscos da escrivaninha"
+                  />
+                </figure>
+                <figure class="hero-photo hero-photo-small">
+                  <img
+                    id="heroSideImageTwo"
+                    src="assets/hero-side-2.png"
+                    alt="Detalhe de anotações e flores em clima de romance"
+                  />
+                </figure>
+              </div>
+            </div>
 
             <article class="progress-sheet" aria-label="Progresso do próximo livro">
               <p class="eyebrow">Atualmente escrevendo <span aria-hidden="true">♥</span></p>
@@ -133,7 +133,7 @@
             </article>
 
             <aside class="diary-preview" id="diario" aria-labelledby="diaryPreviewTitle">
-              <h2 id="diaryPreviewTitle">diário ❀</h2>
+              <h2 id="diaryPreviewTitle">diário</h2>
               <p>pensamentos, desabafos e devaneios de uma escritora.</p>
               <div class="diary-preview-list" id="diaryPreviewList"></div>
             </aside>
@@ -243,7 +243,7 @@
       </div>
     </div>
 
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+    <script src="data.js?v=20260702g"></script>
+    <script src="app.js?v=20260702g"></script>
   </body>
 </html>

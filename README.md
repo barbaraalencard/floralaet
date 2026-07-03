@@ -10,10 +10,11 @@ Primeira versao do site para leitoras, baseada no briefing do chat compartilhado
 - Mural publico simulado no navegador, com nome, emoji, mensagem e respostas.
 - Diario com bilhetes curtos no estilo "Tumblr moderno".
 - Extras fixos e clicaveis: ilustracoes, mapas, arvore genealogica e cenas extras.
-- Paginas de compra para livros fisicos e digitais, com links editaveis.
+- Cada pagina de extra permite publicar varios itens internos pelo painel.
+- Paginas de compra para livros fisicos e digitais, com varios livros cadastraveis em cada uma.
 - Card lateral com playlist do Spotify, editavel pelo painel.
 - Login em `login.html` e painel em `admin.html`.
-- Painel para atualizar progresso, trocar senha, publicar bilhetes, editar extras e responder ao mural.
+- Painel para atualizar progresso, trocar senha, publicar bilhetes, editar extras, cadastrar livros e responder ao mural.
 - Dados salvos localmente no navegador usando `localStorage`.
 
 ## Como testar

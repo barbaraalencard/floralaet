@@ -24,6 +24,10 @@ const heroImage = document.querySelector("#heroImage");
 const spotifyTitle = document.querySelector("#spotifyTitle");
 const spotifyEmbed = document.querySelector("#spotifyEmbed");
 const spotifyCaption = document.querySelector("#spotifyCaption");
+const heroSideImages = [
+  document.querySelector("#heroSideImageOne"),
+  document.querySelector("#heroSideImageTwo"),
+];
 
 let messages = loadMessages();
 let siteState = loadState();
@@ -68,6 +72,26 @@ function renderHero() {
 
   heroImage.src = siteState.hero.image || "assets/escrivaninha-collage.png";
   heroImage.alt = siteState.hero.alt || "Imagem escolhida pela Flora para a página inicial";
+
+  const sideFallbacks = [
+    {
+      image: "assets/hero-side-1.png",
+      alt: "Detalhe delicado de papéis e rabiscos da escrivaninha",
+    },
+    {
+      image: "assets/hero-side-2.png",
+      alt: "Detalhe de anotações e flores em clima de romance",
+    },
+  ];
+  const sideImages = Array.isArray(siteState.hero.sideImages) ? siteState.hero.sideImages : [];
+
+  heroSideImages.forEach((image, index) => {
+    if (!image) return;
+
+    const data = sideImages[index] || sideFallbacks[index];
+    image.src = data.image || sideFallbacks[index].image;
+    image.alt = data.alt || sideFallbacks[index].alt;
+  });
 }
 
 function toSpotifyEmbedUrl(value) {
