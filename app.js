@@ -30,6 +30,8 @@ const newsletterForm = document.querySelector("#newsletterForm");
 const newsletterStatus = document.querySelector("#newsletterStatus");
 const onlineCount = document.querySelector("#onlineCount");
 const visitCount = document.querySelector("#visitCount");
+const visitUpdates = document.querySelector("#visitUpdates");
+const visitUpdatesList = document.querySelector("#visitUpdatesList");
 const heroSideImages = [
   document.querySelector("#heroSideImageOne"),
   document.querySelector("#heroSideImageTwo"),
@@ -37,6 +39,8 @@ const heroSideImages = [
 
 let messages = loadMessages();
 let siteState = loadState();
+let visitSnapshotTimer = null;
+const contentSnapshotKey = "flora-last-content-snapshot";
 
 function createElement(tagName, className, text) {
   const element = document.createElement(tagName);
@@ -301,17 +305,245 @@ function closeWelcome() {
 
 function updateVisitSummary() {
   const previousVisit = localStorage.getItem(lastVisitKey);
-  const message = previousVisit
-    ? "Desde sua última visita, a barra avançou e chegaram novos bilhetes."
-    : "Primeira visita registrada. A escrivaninha já está esperando por você.";
-
   const ticket = document.querySelector(".pink-ticket");
+
   if (ticket && !previousVisit) {
     ticket.innerHTML = "obrigada por estar aqui!<br />você acabou de abrir a escrivaninha. ♡";
   }
 
-  localStorage.setItem(lastVisitKey, new Date().toISOString());
-  return message;
+  return previousVisit;
+}
+
+function cleanText(value) {
+  return String(value || "").trim();
+}
+
+function mapByKey(items, getKey, fields) {
+  const result = {};
+
+  (Array.isArray(items) ? items : []).forEach((item, index) => {
+    const key = getKey(item, index);
+    if (!key) return;
+    result[key] = fields.map((field) => cleanText(item[field])).join("||");
+  });
+
+  return result;
+}
+
+function createContentSnapshot() {
+  const book = siteState.book || {};
+  const extraPages = {};
+  const extraItems = {};
+  const purchaseCategories = {};
+  const purchaseItems = {};
+
+  (Array.isArray(siteState.extras) ? siteState.extras : []).forEach((extra) => {
+    const extraId = cleanText(extra.id || extra.title);
+    if (!extraId) return;
+
+    extraPages[extraId] = [
+      extra.title,
+      extra.description,
+      extra.content,
+      extra.image,
+      extra.fit,
+      extra.locked,
+    ]
+      .map(cleanText)
+      .join("||");
+
+    (Array.isArray(extra.items) ? extra.items : []).forEach((item, index) => {
+      const itemId = cleanText(item.id || `${extraId}-${index}-${item.title}`);
+      if (!itemId) return;
+      extraItems[`${extraId}:${itemId}`] = [
+        item.title,
+        item.description,
+        item.content,
+        item.image,
+        item.fit,
+      ]
+        .map(cleanText)
+        .join("||");
+    });
+  });
+
+  Object.entries(siteState.purchase || {}).forEach(([type, category]) => {
+    purchaseCategories[type] = [
+      category.title,
+      category.description,
+      category.image,
+      category.fit,
+    ]
+      .map(cleanText)
+      .join("||");
+
+    (Array.isArray(category.items) ? category.items : []).forEach((item, index) => {
+      const itemId = cleanText(item.id || `${type}-${index}-${item.title}`);
+      if (!itemId) return;
+      purchaseItems[`${type}:${itemId}`] = [
+        item.title,
+        item.description,
+        item.image,
+        item.fit,
+        item.link,
+        item.buttonLabel,
+      ]
+        .map(cleanText)
+        .join("||");
+    });
+  });
+
+  return {
+    version: 1,
+    book: {
+      title: cleanText(book.title),
+      progress: Number(book.progress) || 0,
+      lastUpdate: cleanText(book.lastUpdate),
+      currentChapter: cleanText(book.currentChapter),
+      quote: cleanText(book.quote),
+    },
+    diary: mapByKey(
+      siteState.diary,
+      (note) => `diary:${cleanText(note.date)}:${cleanText(note.time)}:${cleanText(note.text)}`,
+      ["date", "time", "text"],
+    ),
+    extraPages,
+    extraItems,
+    purchaseCategories,
+    purchaseItems,
+    messages: mapByKey(
+      messages,
+      (message) => `message:${cleanText(message.createdAt)}:${cleanText(message.name)}:${cleanText(message.text)}`,
+      ["name", "text", "createdAt"],
+    ),
+    about: [
+      siteState.about && siteState.about.photo,
+      siteState.about && siteState.about.photoFit,
+      siteState.about && siteState.about.description,
+    ]
+      .map(cleanText)
+      .join("||"),
+  };
+}
+
+function loadContentSnapshot() {
+  try {
+    return JSON.parse(localStorage.getItem(contentSnapshotKey));
+  } catch {
+    return null;
+  }
+}
+
+function countNewItems(previous = {}, current = {}) {
+  return Object.keys(current).filter((key) => !Object.prototype.hasOwnProperty.call(previous, key)).length;
+}
+
+function countChangedItems(previous = {}, current = {}) {
+  return Object.keys(current).filter(
+    (key) => Object.prototype.hasOwnProperty.call(previous, key) && previous[key] !== current[key],
+  ).length;
+}
+
+function chooseCount(count, singular, plural) {
+  return count === 1 ? singular : plural;
+}
+
+function buildVisitUpdates(previous, current) {
+  if (!previous || previous.version !== current.version) {
+    return ["Esta é sua primeira visita registrada neste aparelho. A partir de agora, eu te conto o que mudar por aqui."];
+  }
+
+  const updates = [];
+  const previousBook = previous.book || {};
+  const currentBook = current.book || {};
+
+  if (currentBook.title && currentBook.title !== previousBook.title) {
+    updates.push(`O livro em destaque agora é “${currentBook.title}”.`);
+  }
+
+  if (currentBook.progress > (Number(previousBook.progress) || 0)) {
+    updates.push(`A barra do livro avançou para ${currentBook.progress}%.`);
+  } else if (currentBook.progress !== (Number(previousBook.progress) || 0)) {
+    updates.push(`A barra do livro foi atualizada para ${currentBook.progress}%.`);
+  }
+
+  if (currentBook.currentChapter && currentBook.currentChapter !== previousBook.currentChapter) {
+    updates.push(`O capítulo atual agora é ${currentBook.currentChapter}.`);
+  }
+
+  if (currentBook.lastUpdate && currentBook.lastUpdate !== previousBook.lastUpdate) {
+    updates.push(`A última atualização mudou para ${currentBook.lastUpdate}.`);
+  }
+
+  const newDiary = countNewItems(previous.diary, current.diary);
+  if (newDiary) {
+    updates.push(chooseCount(newDiary, "Tem 1 bilhete novo no diário.", `Tem ${newDiary} bilhetes novos no diário.`));
+  }
+
+  const changedExtras =
+    countNewItems(previous.extraItems, current.extraItems) +
+    countChangedItems(previous.extraItems, current.extraItems) +
+    countChangedItems(previous.extraPages, current.extraPages);
+  if (changedExtras) {
+    updates.push(
+      chooseCount(
+        changedExtras,
+        "Tem 1 conteúdo novo ou atualizado nos extras.",
+        `Tem ${changedExtras} conteúdos novos ou atualizados nos extras.`,
+      ),
+    );
+  }
+
+  const changedPurchase =
+    countNewItems(previous.purchaseItems, current.purchaseItems) +
+    countChangedItems(previous.purchaseItems, current.purchaseItems) +
+    countChangedItems(previous.purchaseCategories, current.purchaseCategories);
+  if (changedPurchase) {
+    updates.push("Os links de compra receberam novidades.");
+  }
+
+  if (previous.about !== current.about) {
+    updates.push("A página sobre a autora foi atualizada.");
+  }
+
+  const newMessages = countNewItems(previous.messages, current.messages);
+  if (newMessages) {
+    updates.push(
+      chooseCount(newMessages, "Uma nova carta apareceu no mural.", `${newMessages} novas cartas apareceram no mural.`),
+    );
+  }
+
+  if (!updates.length) {
+    updates.push("Nada novo desde sua última visita, mas a escrivaninha continua aberta para você.");
+  }
+
+  return updates.slice(0, 6);
+}
+
+function rememberContentSnapshot(snapshot) {
+  try {
+    localStorage.setItem(contentSnapshotKey, JSON.stringify(snapshot));
+    localStorage.setItem(lastVisitKey, new Date().toISOString());
+  } catch {
+    // Se o navegador bloquear armazenamento local, o site continua funcionando normalmente.
+  }
+}
+
+function renderVisitUpdates() {
+  if (!visitUpdates || !visitUpdatesList) return;
+
+  const currentSnapshot = createContentSnapshot();
+  const previousSnapshot = loadContentSnapshot();
+  const updates = buildVisitUpdates(previousSnapshot, currentSnapshot);
+
+  visitUpdates.hidden = false;
+  visitUpdatesList.replaceChildren();
+  updates.forEach((text) => visitUpdatesList.append(createElement("li", null, text)));
+
+  window.clearTimeout(visitSnapshotTimer);
+  visitSnapshotTimer = window.setTimeout(() => {
+    rememberContentSnapshot(createContentSnapshot());
+  }, 2600);
 }
 
 function renderCounters({ online, visits }) {
@@ -418,6 +650,7 @@ setupScrollTopButton();
 trackCounters(renderCounters);
 showWelcomeIfNeeded();
 updateVisitSummary();
+renderVisitUpdates();
 
 subscribeState((nextState) => {
   siteState = nextState;
@@ -427,9 +660,11 @@ subscribeState((nextState) => {
   renderDiary();
   renderExtras();
   renderBuyLinks();
+  renderVisitUpdates();
 });
 
 subscribeMessages((nextMessages) => {
   messages = nextMessages;
   renderMessages();
+  renderVisitUpdates();
 });

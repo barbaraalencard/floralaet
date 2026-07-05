@@ -17,7 +17,7 @@
     <meta property="og:image" content="assets/escrivaninha-collage.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#fbf5ec" />
-    <link rel="stylesheet" href="styles.css?v=20260704m" />
+    <link rel="stylesheet" href="styles.css?v=20260704n" />
   </head>
   <body>
     <div class="welcome-screen" id="welcomeScreen" aria-label="Boas-vindas">
@@ -57,7 +57,7 @@
           <a href="#mural"><img class="nav-icon" src="assets/icon-mural.png" alt="" aria-hidden="true" /> mural</a>
           <a href="#comprar"><img class="nav-icon" src="assets/icon-livros.png" alt="" aria-hidden="true" /> adquirir livros</a>
           <a href="sobre.html"><img class="nav-icon" src="assets/icon-flora.png" alt="" aria-hidden="true" /> sobre a autora</a>
-          <a href="login.html"><img class="nav-icon" src="assets/icon-flora.png" alt="" aria-hidden="true" /> área da flora</a>
+          <a href="login.html"><img class="nav-icon" src="assets/icon-area-flora.png" alt="" aria-hidden="true" /> área da flora</a>
         </nav>
 
         <section class="spotify-card" aria-labelledby="spotifyTitle">
@@ -149,6 +149,11 @@
           <section class="pink-ticket" aria-label="Recado da Flora">
             obrigada por estarem aqui!<br />
             vocês me inspiram todos os dias. ♡
+          </section>
+
+          <section class="visit-updates" id="visitUpdates" aria-labelledby="visitUpdatesTitle" hidden>
+            <h2 id="visitUpdatesTitle">🌷 Enquanto você esteve fora...</h2>
+            <ul id="visitUpdatesList"></ul>
           </section>
 
           <section class="paper-section mural-section" id="mural" aria-labelledby="muralTitle">
@@ -276,7 +281,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js?v=20260703h"></script>
     <script src="data.js?v=20260704k"></script>
-    <script src="app.js?v=20260704k"></script>
+    <script src="app.js?v=20260704n"></script>
   </body>
 </html>
 

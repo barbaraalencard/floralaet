@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Painel da Flora</title>
-    <link rel="stylesheet" href="styles.css?v=20260704m" />
+    <link rel="stylesheet" href="styles.css?v=20260704n" />
   </head>
   <body class="admin-page">
     <main class="admin-shell" id="adminRoot">
@@ -95,6 +95,17 @@
             </nav>
           </section>
 
+          <section class="admin-card" aria-labelledby="backupAdminTitle">
+            <h2 id="backupAdminTitle">backup</h2>
+            <p class="admin-helper">
+              baixe uma cópia de segurança com os conteúdos do site e as cartas do mural.
+            </p>
+            <div class="admin-actions">
+              <button class="button primary" id="backupButton" type="button">baixar backup</button>
+              <p class="admin-status" id="backupStatus" role="status" aria-live="polite"></p>
+            </div>
+          </section>
+
           <section class="admin-card" aria-labelledby="diaryAdminTitle">
             <h2 id="diaryAdminTitle">novo bilhete</h2>
             <form class="admin-form" id="diaryForm">
@@ -151,7 +162,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js?v=20260703h"></script>
     <script src="data.js?v=20260704k"></script>
-    <script src="admin.js?v=20260704k"></script>
+    <script src="admin.js?v=20260704n"></script>
   </body>
 </html>
 

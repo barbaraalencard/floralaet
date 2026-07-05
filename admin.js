@@ -59,6 +59,8 @@ function bootAdmin() {
   const passwordStatus = document.querySelector("#passwordStatus");
   const musicStatus = document.querySelector("#musicStatus");
   const logoutButton = document.querySelector("#logoutButton");
+  const backupButton = document.querySelector("#backupButton");
+  const backupStatus = document.querySelector("#backupStatus");
   const diaryAdminList = document.querySelector("#diaryAdminList");
   const extrasAdminList = document.querySelector("#extrasAdminList");
   const purchaseAdminList = document.querySelector("#purchaseAdminList");
@@ -89,6 +91,30 @@ function bootAdmin() {
   function isPinterestPageLink(url) {
     const text = String(url || "").trim().toLowerCase();
     return text.includes("pin.it/") || (text.includes("pinterest.") && text.includes("/pin/"));
+  }
+
+  function downloadBackup() {
+    const exportedAt = new Date().toISOString();
+    const payload = {
+      version: "flora-leitores-backup-v1",
+      exportedAt,
+      site: state,
+      messages,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `backup-flora-laet-${exportedAt.slice(0, 10)}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flash(backupStatus, "backup baixado para o seu computador.");
   }
 
   function imageFit(value) {
@@ -765,6 +791,10 @@ function bootAdmin() {
     removeMessage(messageId, messages);
     renderAdminMessages();
   });
+  }
+
+  if (backupButton) {
+  backupButton.addEventListener("click", downloadBackup);
   }
 
   if (logoutButton) {
