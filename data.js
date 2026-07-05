@@ -5,6 +5,8 @@
   const lastVisitKey = "flora-last-visit";
   const adminSessionKey = "flora-admin-session";
   const passwordKey = "flora-admin-password";
+  const cloudStateSeedKey = "flora-cloud-state-seeded";
+  const cloudMessagesSeedKey = "flora-cloud-messages-seeded";
   const defaultAdminPassword = "flora2026";
 
   function createId() {
@@ -322,6 +324,75 @@
     };
   }
 
+  const firebaseConfig = window.FloraFirebaseConfig || {};
+  const firebaseAdminEmail = window.FloraFirebaseAdminEmail || "";
+  let firebaseService = null;
+
+  function hasFirebaseConfig() {
+    return Boolean(
+      window.firebase &&
+        window.firebase.firestore &&
+        firebaseConfig.apiKey &&
+        firebaseConfig.projectId &&
+        !String(firebaseConfig.apiKey).includes("COLE_") &&
+        !String(firebaseConfig.projectId).includes("COLE_"),
+    );
+  }
+
+  function initFirebase() {
+    if (firebaseService) return firebaseService;
+    if (!hasFirebaseConfig()) return null;
+
+    const app = window.firebase.apps.length
+      ? window.firebase.app()
+      : window.firebase.initializeApp(firebaseConfig);
+    const db = window.firebase.firestore();
+    const auth = window.firebase.auth();
+    firebaseService = {
+      app,
+      auth,
+      db,
+      stateRef: db.collection("site").doc("state"),
+      messagesRef: db.collection("messages"),
+    };
+
+    return firebaseService;
+  }
+
+  function isFirebaseReady() {
+    return Boolean(initFirebase());
+  }
+
+  function normalizeReply(reply) {
+    return {
+      emoji: reply.emoji || "♡",
+      name: reply.name || "",
+      text: reply.text || "",
+      createdAt: reply.createdAt || new Date().toISOString(),
+    };
+  }
+
+  function normalizeMessage(message) {
+    return {
+      id: message.id || createId(),
+      emoji: message.emoji || "♡",
+      name: message.name || "",
+      text: message.text || "",
+      createdAt: message.createdAt || new Date().toISOString(),
+      replies: Array.isArray(message.replies) ? message.replies.map(normalizeReply) : [],
+    };
+  }
+
+  function normalizeMessages(messages) {
+    return (Array.isArray(messages) ? messages : defaultMessages)
+      .map(normalizeMessage)
+      .sort((first, second) => String(second.createdAt).localeCompare(String(first.createdAt)));
+  }
+
+  function storeMessages(messages) {
+    localStorage.setItem(messageKey, JSON.stringify(normalizeMessages(messages)));
+  }
+
   function loadState() {
     try {
       const stored = JSON.parse(localStorage.getItem(stateKey));
@@ -332,20 +403,252 @@
   }
 
   function saveState(state) {
-    localStorage.setItem(stateKey, JSON.stringify(mergeState(state)));
+    const nextState = mergeState(state);
+    localStorage.setItem(stateKey, JSON.stringify(nextState));
+
+    const service = initFirebase();
+    if (!service || !service.auth.currentUser) return Promise.resolve(false);
+
+    return service.stateRef
+      .set({
+        ...nextState,
+        updatedAt: new Date().toISOString(),
+      })
+      .then(() => true)
+      .catch((error) => {
+        console.warn("Nao foi possivel salvar no Firebase.", error);
+        return false;
+      });
   }
 
   function loadMessages() {
     try {
       const stored = JSON.parse(localStorage.getItem(messageKey));
-      return Array.isArray(stored) ? stored : defaultMessages;
+      return normalizeMessages(stored);
     } catch {
-      return defaultMessages;
+      return normalizeMessages(defaultMessages);
     }
   }
 
   function saveMessages(messages) {
-    localStorage.setItem(messageKey, JSON.stringify(messages));
+    const nextMessages = normalizeMessages(messages);
+    storeMessages(nextMessages);
+
+    const service = initFirebase();
+    if (!service || !service.auth.currentUser) return Promise.resolve(false);
+
+    const batch = service.db.batch();
+    nextMessages.forEach((message) => {
+      batch.set(service.messagesRef.doc(message.id), message);
+    });
+
+    return batch
+      .commit()
+      .then(() => true)
+      .catch((error) => {
+        console.warn("Nao foi possivel salvar as mensagens no Firebase.", error);
+        return false;
+      });
+  }
+
+  function addMessage(message, nextMessages) {
+    const nextMessage = normalizeMessage(message);
+    storeMessages(nextMessages || [nextMessage, ...loadMessages()]);
+
+    const service = initFirebase();
+    if (!service) return Promise.resolve(false);
+
+    return service.messagesRef
+      .doc(nextMessage.id)
+      .set(nextMessage)
+      .then(() => true)
+      .catch((error) => {
+        console.warn("Nao foi possivel enviar a mensagem para o Firebase.", error);
+        return false;
+      });
+  }
+
+  function appendReply(messageId, reply, nextMessages) {
+    const nextReply = normalizeReply(reply);
+    if (nextMessages) storeMessages(nextMessages);
+
+    const service = initFirebase();
+    if (!service) return Promise.resolve(false);
+
+    return service.messagesRef
+      .doc(messageId)
+      .update({
+        replies: window.firebase.firestore.FieldValue.arrayUnion(nextReply),
+      })
+      .then(() => true)
+      .catch((error) => {
+        console.warn("Nao foi possivel salvar a resposta no Firebase.", error);
+        return false;
+      });
+  }
+
+  function removeMessage(messageId, nextMessages) {
+    if (nextMessages) storeMessages(nextMessages);
+
+    const service = initFirebase();
+    if (!service || !service.auth.currentUser) return Promise.resolve(false);
+
+    return service.messagesRef
+      .doc(messageId)
+      .delete()
+      .then(() => true)
+      .catch((error) => {
+        console.warn("Nao foi possivel excluir a mensagem no Firebase.", error);
+        return false;
+      });
+  }
+
+  function subscribeState(callback) {
+    const service = initFirebase();
+    if (!service) return () => {};
+
+    return service.stateRef.onSnapshot(
+      (snapshot) => {
+        if (!snapshot.exists) {
+          if (
+            service.auth.currentUser &&
+            localStorage.getItem(stateKey) &&
+            localStorage.getItem(cloudStateSeedKey) !== firebaseConfig.projectId
+          ) {
+            localStorage.setItem(cloudStateSeedKey, firebaseConfig.projectId);
+            saveState(loadState());
+          }
+
+          return;
+        }
+
+        const nextState = mergeState(snapshot.data());
+        localStorage.setItem(stateKey, JSON.stringify(nextState));
+        callback(nextState);
+      },
+      (error) => {
+        console.warn("Nao foi possivel acompanhar o estado no Firebase.", error);
+      },
+    );
+  }
+
+  function subscribeMessages(callback) {
+    const service = initFirebase();
+    if (!service) return () => {};
+
+    return service.messagesRef.orderBy("createdAt", "desc").onSnapshot(
+      (snapshot) => {
+        const nextMessages = snapshot.docs.map((document) =>
+          normalizeMessage({
+            id: document.id,
+            ...document.data(),
+          }),
+        );
+
+        if (!nextMessages.length) {
+          const hasLocalMessages = Boolean(localStorage.getItem(messageKey));
+          const localMessages = hasLocalMessages ? loadMessages() : [];
+
+          if (
+            service.auth.currentUser &&
+            localMessages.length &&
+            localStorage.getItem(cloudMessagesSeedKey) !== firebaseConfig.projectId
+          ) {
+            localStorage.setItem(cloudMessagesSeedKey, firebaseConfig.projectId);
+            saveMessages(localMessages);
+            callback(localMessages);
+            return;
+          }
+
+          if (hasLocalMessages) {
+            callback(localMessages);
+            return;
+          }
+        }
+
+        storeMessages(nextMessages);
+        callback(nextMessages);
+      },
+      (error) => {
+        console.warn("Nao foi possivel acompanhar as mensagens no Firebase.", error);
+      },
+    );
+  }
+
+  function signInAdmin(email, password) {
+    const service = initFirebase();
+
+    if (!service) {
+      if (password === getAdminPassword()) {
+        sessionStorage.setItem(adminSessionKey, "true");
+        return Promise.resolve(true);
+      }
+
+      return Promise.reject(new Error("senha incorreta"));
+    }
+
+    const resolvedEmail = String(email || firebaseAdminEmail || "").trim();
+    if (!resolvedEmail) {
+      return Promise.reject(new Error("informe o e-mail da autora"));
+    }
+
+    return service.auth.signInWithEmailAndPassword(resolvedEmail, password).then((credential) => {
+      sessionStorage.setItem(adminSessionKey, "true");
+      return credential.user;
+    });
+  }
+
+  function requireAdmin(callback) {
+    const service = initFirebase();
+
+    if (!service) {
+      if (sessionStorage.getItem(adminSessionKey) === "true") {
+        callback();
+        return () => {};
+      }
+
+      window.location.href = "login.html";
+      return () => {};
+    }
+
+    return service.auth.onAuthStateChanged((user) => {
+      if (user) {
+        sessionStorage.setItem(adminSessionKey, "true");
+        callback(user);
+        return;
+      }
+
+      sessionStorage.removeItem(adminSessionKey);
+      window.location.href = "login.html";
+    });
+  }
+
+  function signOutAdmin() {
+    const service = initFirebase();
+    sessionStorage.removeItem(adminSessionKey);
+    if (!service) return Promise.resolve();
+    return service.auth.signOut();
+  }
+
+  function changeAdminPassword(currentPassword, newPassword) {
+    const service = initFirebase();
+
+    if (!service) {
+      if (currentPassword !== getAdminPassword()) {
+        return Promise.reject(new Error("senha atual incorreta"));
+      }
+
+      setAdminPassword(newPassword);
+      return Promise.resolve(true);
+    }
+
+    const user = service.auth.currentUser;
+    if (!user || !user.email) {
+      return Promise.reject(new Error("entre novamente para alterar a senha"));
+    }
+
+    const credential = window.firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+    return user.reauthenticateWithCredential(credential).then(() => user.updatePassword(newPassword));
   }
 
   function getAdminPassword() {
@@ -357,19 +660,29 @@
   }
 
   window.FloraData = {
+    addMessage,
     adminSessionKey,
+    appendReply,
+    changeAdminPassword,
     createId,
     defaultAdminPassword,
     getAdminPassword,
+    isFirebaseReady,
     lastVisitKey,
     loadMessages,
     loadState,
     messageKey,
     passwordKey,
+    requireAdmin,
+    removeMessage,
     saveMessages,
     saveState,
     setAdminPassword,
+    signInAdmin,
+    signOutAdmin,
     stateKey,
+    subscribeMessages,
+    subscribeState,
     welcomeKey,
   };
 })();

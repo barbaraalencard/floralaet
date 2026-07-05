@@ -1,39 +1,49 @@
 const {
-  adminSessionKey,
+  appendReply,
+  changeAdminPassword,
   createId,
-  getAdminPassword,
   loadMessages,
   loadState,
-  saveMessages,
+  requireAdmin,
+  removeMessage,
   saveState,
-  setAdminPassword,
+  signInAdmin,
+  signOutAdmin,
+  subscribeMessages,
+  subscribeState,
 } = window.FloraData;
 
 const loginForm = document.querySelector("#loginForm");
 const adminRoot = document.querySelector("#adminRoot");
 
 if (loginForm) {
-  loginForm.addEventListener("submit", (event) => {
+  loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const password = String(new FormData(loginForm).get("password")).trim();
+    const data = new FormData(loginForm);
+    const email = String(data.get("email") || "").trim();
+    const password = String(data.get("password")).trim();
     const status = document.querySelector("#loginStatus");
 
-    if (password === getAdminPassword()) {
-      sessionStorage.setItem(adminSessionKey, "true");
+    status.textContent = "entrando...";
+
+    try {
+      await signInAdmin(email, password);
       window.location.href = "admin.html";
       return;
+    } catch (error) {
+      status.textContent = error.code === "auth/invalid-credential" ? "e-mail ou senha incorretos." : error.message;
     }
-
-    status.textContent = "senha incorreta. tente de novo.";
   });
 }
 
+let adminBooted = false;
+
 if (adminRoot) {
-  if (sessionStorage.getItem(adminSessionKey) !== "true") {
-    window.location.href = "login.html";
-  } else {
+  requireAdmin(() => {
+    if (adminBooted) return;
+    adminBooted = true;
     bootAdmin();
-  }
+  });
 }
 
 function bootAdmin() {
@@ -74,31 +84,35 @@ function bootAdmin() {
     return String(data.get(key) || "").trim();
   }
 
+  function isPinterestPageLink(url) {
+    const text = String(url || "").trim().toLowerCase();
+    return text.includes("pin.it/") || (text.includes("pinterest.") && text.includes("/pin/"));
+  }
+
   function fillBookForm() {
+    if (!bookForm || !state.book) return;
+
     const book = state.book;
     bookForm.elements.title.value = book.title;
     bookForm.elements.progress.value = book.progress;
     bookForm.elements.lastUpdate.value = book.lastUpdate;
     bookForm.elements.currentChapter.value = book.currentChapter;
-    bookForm.elements.totalChapters.value = book.totalChapters;
-    bookForm.elements.nextMilestone.value = book.nextMilestone;
     bookForm.elements.quote.value = book.quote;
   }
 
   function fillHeroForm() {
+    if (!heroForm || !state.hero) return;
+
     const sideImages = Array.isArray(state.hero.sideImages) ? state.hero.sideImages : [];
 
     heroForm.elements.image.value = state.hero.image;
-    heroForm.elements.alt.value = state.hero.alt;
     heroForm.elements.sideImageOne.value = sideImages[0]?.image || "assets/hero-side-1.png";
-    heroForm.elements.sideAltOne.value =
-      sideImages[0]?.alt || "Detalhe delicado de papéis e rabiscos da escrivaninha";
     heroForm.elements.sideImageTwo.value = sideImages[1]?.image || "assets/hero-side-2.png";
-    heroForm.elements.sideAltTwo.value =
-      sideImages[1]?.alt || "Detalhe de anotações e flores em clima de romance";
   }
 
   function fillMusicForm() {
+    if (!musicForm) return;
+
     const music = state.music || {};
     musicForm.elements.title.value = music.title || "no fone agora";
     musicForm.elements.caption.value = music.caption || "playlist da Flora";
@@ -106,6 +120,8 @@ function bootAdmin() {
   }
 
   function renderDiaryAdmin() {
+    if (!diaryAdminList) return;
+
     diaryAdminList.replaceChildren();
 
     state.diary.forEach((note) => {
@@ -186,6 +202,8 @@ function bootAdmin() {
   }
 
   function renderExtrasAdmin() {
+    if (!extrasAdminList) return;
+
     extrasAdminList.replaceChildren();
 
     state.extras.forEach((extra) => {
@@ -261,6 +279,8 @@ function bootAdmin() {
   }
 
   function renderPurchaseAdmin() {
+    if (!purchaseAdminList) return;
+
     purchaseAdminList.replaceChildren();
 
     [
@@ -306,9 +326,19 @@ function bootAdmin() {
   }
 
   function renderAdminMessages() {
+    if (!adminMessages) return;
+
     adminMessages.replaceChildren();
 
-    messages.forEach((message) => {
+    const unansweredMessages = messages.filter((message) => !message.replies?.length);
+
+    if (!unansweredMessages.length) {
+      const empty = createElement("p", "empty-admin-note", "nenhum recado pendente por enquanto.");
+      adminMessages.append(empty);
+      return;
+    }
+
+    unansweredMessages.forEach((message) => {
       const article = createElement("article");
       article.append(
         createElement("h3", null, `${message.emoji} ${message.name}`),
@@ -329,7 +359,10 @@ function bootAdmin() {
       const actions = createElement("div", "admin-actions");
       const button = createElement("button", "button primary", "responder");
       button.type = "submit";
-      actions.append(button);
+      const remove = createElement("button", "button ghost", "excluir recado");
+      remove.type = "button";
+      remove.dataset.removeMessage = message.id;
+      actions.append(button, remove);
 
       form.append(label, actions);
       article.append(form);
@@ -337,235 +370,258 @@ function bootAdmin() {
     });
   }
 
-  bookForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(bookForm);
+  if (bookForm) {
+    bookForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(bookForm);
 
-    state.book = {
-      title: value(data, "title"),
-      progress: Number(data.get("progress")),
-      lastUpdate: value(data, "lastUpdate"),
-      currentChapter: Number(data.get("currentChapter")),
-      totalChapters: Number(data.get("totalChapters")),
-      nextMilestone: value(data, "nextMilestone"),
-      quote: value(data, "quote"),
-    };
+      state.book = {
+        ...state.book,
+        title: value(data, "title"),
+        progress: Number(data.get("progress")),
+        lastUpdate: value(data, "lastUpdate"),
+        currentChapter: Number(data.get("currentChapter")),
+        quote: value(data, "quote"),
+      };
 
-    saveState(state);
-    flash(bookStatus, "progresso salvo na escrivaninha.");
-  });
+      saveState(state);
+      flash(bookStatus, "progresso salvo na escrivaninha.");
+    });
+  }
 
-  heroForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(heroForm);
+  if (heroForm) {
+    heroForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(heroForm);
+      const image = value(data, "image");
+      const sideImageOne = value(data, "sideImageOne");
+      const sideImageTwo = value(data, "sideImageTwo");
 
-    state.hero = {
-      image: value(data, "image"),
-      alt: value(data, "alt"),
-      sideImages: [
-        {
-          image: value(data, "sideImageOne"),
-          alt: value(data, "sideAltOne"),
-        },
-        {
-          image: value(data, "sideImageTwo"),
-          alt: value(data, "sideAltTwo"),
-        },
-      ],
-    };
+      if ([image, sideImageOne, sideImageTwo].some(isPinterestPageLink)) {
+        flash(heroStatus, "cole o link direto da imagem, não o link do pin do Pinterest.");
+        return;
+      }
 
-    saveState(state);
-    flash(heroStatus, "imagens iniciais salvas.");
-  });
+      state.hero = {
+        image,
+        alt: "Imagem escolhida pela Flora para a página inicial",
+        sideImages: [
+          {
+            image: sideImageOne,
+            alt: "Imagem lateral da página inicial",
+          },
+          {
+            image: sideImageTwo,
+            alt: "Imagem lateral da página inicial",
+          },
+        ],
+      };
 
-  passwordForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(passwordForm);
-    const currentPassword = value(data, "currentPassword");
-    const newPassword = value(data, "newPassword");
+      saveState(state);
+      flash(heroStatus, "imagens iniciais salvas.");
+    });
+  }
 
-    if (currentPassword !== getAdminPassword()) {
-      flash(passwordStatus, "senha atual incorreta.");
-      return;
-    }
+  if (passwordForm) {
+    passwordForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = new FormData(passwordForm);
+      const currentPassword = value(data, "currentPassword");
+      const newPassword = value(data, "newPassword");
 
-    setAdminPassword(newPassword);
-    passwordForm.reset();
-    flash(passwordStatus, "senha alterada com sucesso.");
-  });
+      try {
+        await changeAdminPassword(currentPassword, newPassword);
+        passwordForm.reset();
+        flash(passwordStatus, "senha alterada com sucesso.");
+      } catch (error) {
+        flash(passwordStatus, error.code === "auth/wrong-password" ? "senha atual incorreta." : error.message);
+      }
+    });
+  }
 
-  diaryForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(diaryForm);
+  if (diaryForm) {
+    diaryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(diaryForm);
 
-    state.diary = [
-      {
-        id: createId(),
-        date: value(data, "date"),
-        time: value(data, "time"),
-        text: value(data, "text"),
-      },
-      ...state.diary,
-    ];
-
-    saveState(state);
-    diaryForm.reset();
-    renderDiaryAdmin();
-  });
-
-  musicForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(musicForm);
-
-    state.music = {
-      title: value(data, "title"),
-      caption: value(data, "caption"),
-      spotifyUrl: value(data, "spotifyUrl"),
-    };
-
-    saveState(state);
-    flash(musicStatus, "playlist salva na lateral.");
-  });
-
-  extrasAdminList.addEventListener("submit", (event) => {
-    const pageForm = event.target.closest("form[data-extra-id]");
-    const addForm = event.target.closest("form[data-add-extra-item]");
-    const itemForm = event.target.closest("form[data-extra-item-id]");
-
-    if (!pageForm && !addForm && !itemForm) return;
-    event.preventDefault();
-
-    if (pageForm) {
-      const data = new FormData(pageForm);
-      const extra = state.extras.find((item) => item.id === pageForm.dataset.extraId);
-      if (!extra) return;
-
-      extra.label = value(data, "label");
-      extra.title = value(data, "title");
-      extra.image = value(data, "image");
-      extra.description = value(data, "description");
-      extra.content = value(data, "content");
-      extra.locked = data.get("locked") === "on";
-    }
-
-    if (addForm) {
-      const data = new FormData(addForm);
-      const extra = state.extras.find((item) => item.id === addForm.dataset.addExtraItem);
-      if (!extra) return;
-
-      extra.items = [
+      state.diary = [
         {
           id: createId(),
-          title: value(data, "title"),
-          image: value(data, "image"),
-          description: value(data, "description"),
-          content: value(data, "content"),
+          date: value(data, "date"),
+          time: value(data, "time"),
+          text: value(data, "text"),
         },
-        ...extra.items,
+        ...state.diary,
       ];
-    }
 
-    if (itemForm) {
-      const data = new FormData(itemForm);
-      const extra = state.extras.find((item) => item.id === itemForm.dataset.extraParent);
-      const item = extra && extra.items.find((entry) => entry.id === itemForm.dataset.extraItemId);
-      if (!item) return;
+      saveState(state);
+      diaryForm.reset();
+      renderDiaryAdmin();
+    });
+  }
 
-      item.title = value(data, "title");
-      item.image = value(data, "image");
-      item.description = value(data, "description");
-      item.content = value(data, "content");
-    }
+  if (musicForm) {
+    musicForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(musicForm);
 
-    saveState(state);
-    renderExtrasAdmin();
-  });
+      state.music = {
+        title: value(data, "title"),
+        caption: value(data, "caption"),
+        spotifyUrl: value(data, "spotifyUrl"),
+      };
 
-  extrasAdminList.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-remove-extra-item]");
-    if (!button) return;
+      saveState(state);
+      flash(musicStatus, "playlist salva na lateral.");
+    });
+  }
 
-    const extra = state.extras.find((item) => item.id === button.dataset.extraParent);
-    if (!extra) return;
+  if (extrasAdminList) {
+    extrasAdminList.addEventListener("submit", (event) => {
+      const pageForm = event.target.closest("form[data-extra-id]");
+      const addForm = event.target.closest("form[data-add-extra-item]");
+      const itemForm = event.target.closest("form[data-extra-item-id]");
 
-    extra.items = extra.items.filter((item) => item.id !== button.dataset.removeExtraItem);
-    saveState(state);
-    renderExtrasAdmin();
-  });
+      if (!pageForm && !addForm && !itemForm) return;
+      event.preventDefault();
 
-  purchaseAdminList.addEventListener("submit", (event) => {
-    const categoryForm = event.target.closest("form[data-purchase-id]");
-    const addForm = event.target.closest("form[data-add-purchase-item]");
-    const itemForm = event.target.closest("form[data-purchase-item-id]");
+      if (pageForm) {
+        const data = new FormData(pageForm);
+        const extra = state.extras.find((item) => item.id === pageForm.dataset.extraId);
+        if (!extra) return;
 
-    if (!categoryForm && !addForm && !itemForm) return;
-    event.preventDefault();
+        extra.label = value(data, "label");
+        extra.title = value(data, "title");
+        extra.image = value(data, "image");
+        extra.description = value(data, "description");
+        extra.content = value(data, "content");
+        extra.locked = data.get("locked") === "on";
+      }
 
-    if (categoryForm) {
-      const data = new FormData(categoryForm);
-      const purchase = state.purchase[categoryForm.dataset.purchaseId];
+      if (addForm) {
+        const data = new FormData(addForm);
+        const extra = state.extras.find((item) => item.id === addForm.dataset.addExtraItem);
+        if (!extra) return;
+
+        extra.items = [
+          {
+            id: createId(),
+            title: value(data, "title"),
+            image: value(data, "image"),
+            description: value(data, "description"),
+            content: value(data, "content"),
+          },
+          ...extra.items,
+        ];
+      }
+
+      if (itemForm) {
+        const data = new FormData(itemForm);
+        const extra = state.extras.find((item) => item.id === itemForm.dataset.extraParent);
+        const item = extra && extra.items.find((entry) => entry.id === itemForm.dataset.extraItemId);
+        if (!item) return;
+
+        item.title = value(data, "title");
+        item.image = value(data, "image");
+        item.description = value(data, "description");
+        item.content = value(data, "content");
+      }
+
+      saveState(state);
+      renderExtrasAdmin();
+    });
+
+    extrasAdminList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-remove-extra-item]");
+      if (!button) return;
+
+      const extra = state.extras.find((item) => item.id === button.dataset.extraParent);
+      if (!extra) return;
+
+      extra.items = extra.items.filter((item) => item.id !== button.dataset.removeExtraItem);
+      saveState(state);
+      renderExtrasAdmin();
+    });
+  }
+
+  if (purchaseAdminList) {
+    purchaseAdminList.addEventListener("submit", (event) => {
+      const categoryForm = event.target.closest("form[data-purchase-id]");
+      const addForm = event.target.closest("form[data-add-purchase-item]");
+      const itemForm = event.target.closest("form[data-purchase-item-id]");
+
+      if (!categoryForm && !addForm && !itemForm) return;
+      event.preventDefault();
+
+      if (categoryForm) {
+        const data = new FormData(categoryForm);
+        const purchase = state.purchase[categoryForm.dataset.purchaseId];
+        if (!purchase) return;
+
+        purchase.title = value(data, "title");
+        purchase.image = value(data, "image");
+        purchase.description = value(data, "description");
+      }
+
+      if (addForm) {
+        const data = new FormData(addForm);
+        const purchase = state.purchase[addForm.dataset.addPurchaseItem];
+        if (!purchase) return;
+
+        purchase.items = [
+          {
+            id: createId(),
+            title: value(data, "title"),
+            image: value(data, "image"),
+            link: value(data, "link"),
+            buttonLabel: value(data, "buttonLabel"),
+            description: value(data, "description"),
+          },
+          ...purchase.items,
+        ];
+      }
+
+      if (itemForm) {
+        const data = new FormData(itemForm);
+        const purchase = state.purchase[itemForm.dataset.purchaseType];
+        const book = purchase && purchase.items.find((item) => item.id === itemForm.dataset.purchaseItemId);
+        if (!book) return;
+
+        book.title = value(data, "title");
+        book.image = value(data, "image");
+        book.link = value(data, "link");
+        book.buttonLabel = value(data, "buttonLabel");
+        book.description = value(data, "description");
+      }
+
+      saveState(state);
+      renderPurchaseAdmin();
+    });
+
+    purchaseAdminList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-remove-purchase-item]");
+      if (!button) return;
+
+      const purchase = state.purchase[button.dataset.purchaseType];
       if (!purchase) return;
 
-      purchase.title = value(data, "title");
-      purchase.image = value(data, "image");
-      purchase.description = value(data, "description");
-    }
+      purchase.items = purchase.items.filter((item) => item.id !== button.dataset.removePurchaseItem);
+      saveState(state);
+      renderPurchaseAdmin();
+    });
+  }
 
-    if (addForm) {
-      const data = new FormData(addForm);
-      const purchase = state.purchase[addForm.dataset.addPurchaseItem];
-      if (!purchase) return;
+  if (diaryAdminList) {
+    diaryAdminList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-remove-diary]");
+      if (!button) return;
+      state.diary = state.diary.filter((note) => note.id !== button.dataset.removeDiary);
+      saveState(state);
+      renderDiaryAdmin();
+    });
+  }
 
-      purchase.items = [
-        {
-          id: createId(),
-          title: value(data, "title"),
-          image: value(data, "image"),
-          link: value(data, "link"),
-          buttonLabel: value(data, "buttonLabel"),
-          description: value(data, "description"),
-        },
-        ...purchase.items,
-      ];
-    }
-
-    if (itemForm) {
-      const data = new FormData(itemForm);
-      const purchase = state.purchase[itemForm.dataset.purchaseType];
-      const book = purchase && purchase.items.find((item) => item.id === itemForm.dataset.purchaseItemId);
-      if (!book) return;
-
-      book.title = value(data, "title");
-      book.image = value(data, "image");
-      book.link = value(data, "link");
-      book.buttonLabel = value(data, "buttonLabel");
-      book.description = value(data, "description");
-    }
-
-    saveState(state);
-    renderPurchaseAdmin();
-  });
-
-  purchaseAdminList.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-remove-purchase-item]");
-    if (!button) return;
-
-    const purchase = state.purchase[button.dataset.purchaseType];
-    if (!purchase) return;
-
-    purchase.items = purchase.items.filter((item) => item.id !== button.dataset.removePurchaseItem);
-    saveState(state);
-    renderPurchaseAdmin();
-  });
-
-  diaryAdminList.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-remove-diary]");
-    if (!button) return;
-    state.diary = state.diary.filter((note) => note.id !== button.dataset.removeDiary);
-    saveState(state);
-    renderDiaryAdmin();
-  });
-
+  if (adminMessages) {
   adminMessages.addEventListener("submit", (event) => {
     const form = event.target.closest("form[data-reply-to]");
     if (!form) return;
@@ -579,16 +635,31 @@ function bootAdmin() {
       emoji: "✒",
       name: "Flora",
       text: replyText,
+      createdAt: new Date().toISOString(),
     });
 
-    saveMessages(messages);
+    appendReply(message.id, message.replies[message.replies.length - 1], messages);
     form.reset();
+    renderAdminMessages();
   });
 
-  logoutButton.addEventListener("click", () => {
-    sessionStorage.removeItem(adminSessionKey);
+  adminMessages.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-message]");
+    if (!button) return;
+
+    const messageId = button.dataset.removeMessage;
+    messages = messages.filter((message) => message.id !== messageId);
+    removeMessage(messageId, messages);
+    renderAdminMessages();
+  });
+  }
+
+  if (logoutButton) {
+  logoutButton.addEventListener("click", async () => {
+    await signOutAdmin();
     window.location.href = "login.html";
   });
+  }
 
   fillBookForm();
   fillHeroForm();
@@ -597,4 +668,19 @@ function bootAdmin() {
   renderExtrasAdmin();
   renderPurchaseAdmin();
   renderAdminMessages();
+
+  subscribeState((nextState) => {
+    state = nextState;
+    fillBookForm();
+    fillHeroForm();
+    fillMusicForm();
+    renderDiaryAdmin();
+    renderExtrasAdmin();
+    renderPurchaseAdmin();
+  });
+
+  subscribeMessages((nextMessages) => {
+    messages = nextMessages;
+    renderAdminMessages();
+  });
 }

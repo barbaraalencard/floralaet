@@ -1,4 +1,4 @@
-const state = window.FloraData.loadState();
+let state = window.FloraData.loadState();
 const fallbackImage = "assets/escrivaninha-collage.png";
 
 function createElement(tagName, className, text) {
@@ -52,6 +52,24 @@ function renderExtraItems(extra) {
   });
 }
 
+function renderLockedExtra() {
+  const list = document.querySelector("#detailItems");
+  if (!list) return;
+
+  list.replaceChildren();
+
+  const note = createElement("div", "locked-detail");
+  const title = createElement("strong", null, "guardado na gaveta");
+  const text = createElement(
+    "p",
+    null,
+    "Essa página ainda está reservada pela Flora. Quando chegar a hora, ela aparece por aqui.",
+  );
+
+  note.append(title, text);
+  list.append(note);
+}
+
 function renderPurchaseItems(purchase) {
   const list = document.querySelector("#bookList");
   if (!list) return;
@@ -89,8 +107,16 @@ function renderExtraPage(extraId) {
   setText("#detailLabel", extra.label);
   setText("#detailTitle", extra.title);
   setText("#detailDescription", extra.description);
-  setText("#detailContent", extra.content);
   setImage("#detailImage", extra.image, extra.title);
+
+  if (extra.locked) {
+    document.body.classList.add("locked-detail-page");
+    setText("#detailContent", "Conteúdo guardado para as leitoras descobrirem depois.");
+    renderLockedExtra();
+    return;
+  }
+
+  setText("#detailContent", extra.content);
   renderExtraItems(extra);
 }
 
@@ -109,5 +135,14 @@ function renderPurchasePage(purchaseType) {
 
 const { extraId, purchaseType } = document.body.dataset;
 
-if (extraId) renderExtraPage(extraId);
-if (purchaseType) renderPurchasePage(purchaseType);
+function renderCurrentPage() {
+  if (extraId) renderExtraPage(extraId);
+  if (purchaseType) renderPurchasePage(purchaseType);
+}
+
+renderCurrentPage();
+
+window.FloraData.subscribeState((nextState) => {
+  state = nextState;
+  renderCurrentPage();
+});

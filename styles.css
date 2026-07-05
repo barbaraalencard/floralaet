@@ -418,6 +418,15 @@ img {
   line-height: 1;
 }
 
+.welcome-chibi {
+  display: block;
+  width: min(190px, 82%);
+  margin: 28px auto 0;
+  filter: drop-shadow(0 16px 18px rgba(49, 31, 24, 0.13));
+  transform: rotate(-2deg);
+  pointer-events: none;
+}
+
 .welcome-copy p {
   max-width: 240px;
   margin: 34px 0 0;
@@ -517,6 +526,13 @@ img {
   padding: 36px 32px 28px;
 }
 
+.progress-sheet .eyebrow {
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  text-align: center;
+}
+
 .progress-sheet::after {
   content: "";
   position: absolute;
@@ -530,8 +546,9 @@ img {
 .progress-sheet h2 {
   font-family: var(--serif);
   font-style: italic;
-  margin: 22px 0 22px;
+  margin: 22px auto;
   max-width: 14ch;
+  text-align: center;
   font-size: clamp(1.65rem, 2.3vw, 2.3rem);
   font-weight: 500;
   line-height: 1.3;
@@ -576,7 +593,7 @@ img {
 
 .progress-facts {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
   padding-top: 20px;
@@ -929,6 +946,37 @@ textarea:focus {
   color: var(--rose);
 }
 
+.locked-extra {
+  cursor: not-allowed;
+}
+
+.locked-extra img {
+  filter: grayscale(0.2) sepia(0.08);
+  opacity: 0.72;
+}
+
+.locked-extra:hover {
+  transform: none;
+}
+
+.locked-detail {
+  padding: 18px;
+  border: 1px dashed var(--rose);
+  border-radius: 6px;
+  background: rgba(223, 205, 241, 0.36);
+}
+
+.locked-detail strong {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-family: var(--typewriter);
+  color: var(--rose);
+}
+
+.locked-detail p {
+  margin: 0;
+}
+
 .detail-page {
   min-height: 100vh;
 }
@@ -1089,6 +1137,24 @@ textarea:focus {
   gap: 12px;
 }
 
+.newsletter-status {
+  grid-column: 1 / -1;
+  min-height: 20px;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--hand);
+  font-size: 0.9rem;
+}
+
+.hidden-frame {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .site-footer {
   display: flex;
   justify-content: space-between;
@@ -1176,6 +1242,56 @@ textarea:focus {
   align-items: start;
 }
 
+.admin-single-column {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-helper {
+  max-width: 780px;
+  margin: -4px 0 18px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.admin-link-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-link-list a {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--ink);
+  border-radius: 14px;
+  background: var(--lavender);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: 5px 5px 0 rgba(248, 214, 224, 0.95);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.admin-link-list a:hover,
+.admin-link-list a:focus-visible {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 rgba(248, 214, 224, 0.95);
+}
+
+.admin-link-list strong {
+  font-family: var(--type);
+  font-size: 1rem;
+}
+
+.admin-link-list span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .admin-card {
   padding: 24px;
 }
@@ -1221,6 +1337,14 @@ textarea:focus {
   margin: 0 0 10px;
   color: var(--muted);
   font-size: 0.84rem;
+}
+
+.admin-list .empty-admin-note {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  background: rgba(255, 250, 242, 0.62);
 }
 
 .admin-list textarea {
@@ -1359,6 +1483,11 @@ textarea:focus {
   .welcome-copy {
     min-height: auto;
     padding-top: 10px;
+  }
+
+  .welcome-chibi {
+    width: min(170px, 68%);
+    margin-top: 20px;
   }
 
   .welcome-paper h1 strong {

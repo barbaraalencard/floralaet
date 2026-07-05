@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login | Flora Laet</title>
-    <link rel="stylesheet" href="styles.css?v=20260702i" />
+    <link rel="stylesheet" href="styles.css?v=20260703g" />
   </head>
   <body class="auth-page">
     <main class="auth-card" aria-labelledby="loginTitle">
@@ -13,6 +13,16 @@
       <p>entre para atualizar a escrivaninha, os bilhetes e os extras.</p>
 
       <form id="loginForm">
+        <label>
+          <span>e-mail</span>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            placeholder="seu e-mail de autora"
+          />
+        </label>
         <label>
           <span>senha</span>
           <input
@@ -31,7 +41,11 @@
       </form>
     </main>
 
-    <script src="data.js?v=20260702g"></script>
-    <script src="admin.js?v=20260702g"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js?v=20260703h"></script>
+    <script src="data.js?v=20260703g"></script>
+    <script src="admin.js?v=20260703g"></script>
   </body>
 </html>

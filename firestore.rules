@@ -1,0 +1,76 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function hasText(value, maxLength) {
+      return value is string &&
+        value.size() > 0 &&
+        value.size() <= maxLength;
+    }
+
+    function validReply(reply) {
+      return reply is map &&
+        reply.keys().hasOnly(["emoji", "name", "text", "createdAt"]) &&
+        hasText(reply.emoji, 12) &&
+        hasText(reply.name, 32) &&
+        hasText(reply.text, 220) &&
+        hasText(reply.createdAt, 40);
+    }
+
+    function validMessageCreate(messageId) {
+      return request.resource.data.keys().hasOnly([
+          "id",
+          "emoji",
+          "name",
+          "text",
+          "createdAt",
+          "replies"
+        ]) &&
+        request.resource.data.id == messageId &&
+        hasText(request.resource.data.emoji, 12) &&
+        hasText(request.resource.data.name, 32) &&
+        hasText(request.resource.data.text, 220) &&
+        hasText(request.resource.data.createdAt, 40) &&
+        request.resource.data.replies is list &&
+        request.resource.data.replies.size() == 0;
+    }
+
+    function validPublicReplyUpdate() {
+      let changedKeys = request.resource.data.diff(resource.data).changedKeys();
+      let oldReplies = resource.data.replies;
+      let nextReplies = request.resource.data.replies;
+
+      return changedKeys.hasOnly(["replies"]) &&
+        oldReplies is list &&
+        nextReplies is list &&
+        nextReplies.size() == oldReplies.size() + 1 &&
+        validReply(nextReplies[oldReplies.size()]);
+    }
+
+    match /site/state {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow read: if true;
+      allow create: if isAdmin() || validMessageCreate(messageId);
+      allow update: if isAdmin() || validPublicReplyUpdate();
+      allow delete: if isAdmin();
+    }
+
+    match /admins/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow write: if false;
+    }
+  }
+}

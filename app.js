@@ -1,8 +1,10 @@
 const {
+  addMessage,
+  appendReply,
   loadMessages,
   loadState,
-  saveMessages,
-  messageKey,
+  subscribeMessages,
+  subscribeState,
   welcomeKey,
   lastVisitKey,
   createId,
@@ -16,7 +18,6 @@ const messageList = document.querySelector("#messageList");
 const formStatus = document.querySelector("#formStatus");
 const readerEmoji = document.querySelector("#readerEmoji");
 const emojiButtons = document.querySelectorAll(".emoji-option");
-const focusMessageButton = document.querySelector("#focusMessageButton");
 const diaryPreviewList = document.querySelector("#diaryPreviewList");
 const extrasList = document.querySelector("#extrasList");
 const buyList = document.querySelector("#buyList");
@@ -24,6 +25,8 @@ const heroImage = document.querySelector("#heroImage");
 const spotifyTitle = document.querySelector("#spotifyTitle");
 const spotifyEmbed = document.querySelector("#spotifyEmbed");
 const spotifyCaption = document.querySelector("#spotifyCaption");
+const newsletterForm = document.querySelector("#newsletterForm");
+const newsletterStatus = document.querySelector("#newsletterStatus");
 const heroSideImages = [
   document.querySelector("#heroSideImageOne"),
   document.querySelector("#heroSideImageTwo"),
@@ -60,18 +63,29 @@ function renderBook() {
   setText("#progressQuote", book.quote);
   setText("#lastUpdate", book.lastUpdate);
   setText("#currentChapter", book.currentChapter);
-  setText("#totalChapters", book.totalChapters);
-  setText("#nextMilestone", book.nextMilestone);
 
   const fill = document.querySelector("#progressFill");
   if (fill) fill.style.setProperty("--progress", `${progress}%`);
 }
 
+function setImageSource(image, src, fallback, alt) {
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = fallback;
+  };
+  image.src = src || fallback;
+  image.alt = alt || "";
+}
+
 function renderHero() {
   if (!heroImage || !siteState.hero) return;
 
-  heroImage.src = siteState.hero.image || "assets/escrivaninha-collage.png";
-  heroImage.alt = siteState.hero.alt || "Imagem escolhida pela Flora para a página inicial";
+  setImageSource(
+    heroImage,
+    siteState.hero.image,
+    "assets/escrivaninha-collage.png",
+    siteState.hero.alt || "Imagem escolhida pela Flora para a página inicial",
+  );
 
   const sideFallbacks = [
     {
@@ -89,8 +103,7 @@ function renderHero() {
     if (!image) return;
 
     const data = sideImages[index] || sideFallbacks[index];
-    image.src = data.image || sideFallbacks[index].image;
-    image.alt = data.alt || sideFallbacks[index].alt;
+    setImageSource(image, data.image, sideFallbacks[index].image, data.alt || sideFallbacks[index].alt);
   });
 }
 
@@ -131,7 +144,7 @@ function renderExtras() {
   siteState.extras.forEach((extra) => {
     const article = document.createElement("a");
     article.className = "extra-card";
-    article.href = extra.page || "#";
+    article.href = extra.locked ? "#extras" : extra.page || "#";
     const img = document.createElement("img");
     img.src = extra.image || "assets/escrivaninha-collage.png";
     img.alt = "";
@@ -144,6 +157,11 @@ function renderExtras() {
 
     if (extra.locked) {
       article.classList.add("locked-extra");
+      article.setAttribute("aria-disabled", "true");
+      article.title = "Conteúdo guardado para abrir mais tarde.";
+      article.addEventListener("click", (event) => {
+        event.preventDefault();
+      });
       article.append(createElement("strong", "locked", "guardado na gaveta"));
     }
 
@@ -281,12 +299,6 @@ emojiButtons.forEach((button) => {
 
 enterButton.addEventListener("click", closeWelcome);
 
-if (focusMessageButton) {
-  focusMessageButton.addEventListener("click", () => {
-    document.querySelector("#readerMessage").focus();
-  });
-}
-
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -303,7 +315,7 @@ form.addEventListener("submit", (event) => {
   if (!nextMessage.name || !nextMessage.text) return;
 
   messages = [nextMessage, ...messages];
-  saveMessages(messages);
+  addMessage(nextMessage, messages);
   renderMessages();
   form.reset();
   readerEmoji.value = "🌷";
@@ -313,6 +325,22 @@ form.addEventListener("submit", (event) => {
     formStatus.textContent = "";
   }, 3600);
 });
+
+if (newsletterForm) {
+  newsletterForm.addEventListener("submit", () => {
+    if (newsletterStatus) {
+      newsletterStatus.textContent = "E-mail enviado para a lista da Flora. ♡";
+    }
+
+    window.setTimeout(() => {
+      newsletterForm.reset();
+    }, 300);
+
+    window.setTimeout(() => {
+      if (newsletterStatus) newsletterStatus.textContent = "";
+    }, 4200);
+  });
+}
 
 messageList.addEventListener("click", (event) => {
   const button = event.target.closest(".reply-button");
@@ -345,7 +373,7 @@ messageList.addEventListener("submit", (event) => {
   if (!reply.name || !reply.text) return;
 
   message.replies.push(reply);
-  saveMessages(messages);
+  appendReply(message.id, reply, messages);
   renderMessages();
 });
 
@@ -358,3 +386,18 @@ renderBuyLinks();
 renderMessages();
 showWelcomeIfNeeded();
 updateVisitSummary();
+
+subscribeState((nextState) => {
+  siteState = nextState;
+  renderBook();
+  renderHero();
+  renderMusic();
+  renderDiary();
+  renderExtras();
+  renderBuyLinks();
+});
+
+subscribeMessages((nextMessages) => {
+  messages = nextMessages;
+  renderMessages();
+});

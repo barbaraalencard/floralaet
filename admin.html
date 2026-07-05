@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Painel da Flora</title>
-    <link rel="stylesheet" href="styles.css?v=20260702i" />
+    <link rel="stylesheet" href="styles.css?v=20260704d" />
   </head>
   <body class="admin-page">
     <main class="admin-shell" id="adminRoot">
@@ -37,14 +37,6 @@
                 <span>capítulo atual</span>
                 <input name="currentChapter" type="number" min="0" required />
               </label>
-              <label>
-                <span>total de capítulos</span>
-                <input name="totalChapters" type="number" min="1" required />
-              </label>
-              <label class="full">
-                <span>próximo marco</span>
-                <input name="nextMilestone" required />
-              </label>
               <label class="full">
                 <span>frase da barra</span>
                 <textarea name="quote" rows="3" required></textarea>
@@ -59,40 +51,6 @@
           <section class="admin-card" aria-labelledby="messagesAdminTitle">
             <h2 id="messagesAdminTitle">mural</h2>
             <div class="admin-list" id="adminMessages"></div>
-          </section>
-
-          <section class="admin-card" aria-labelledby="heroAdminTitle">
-            <h2 id="heroAdminTitle">imagens iniciais</h2>
-            <form class="admin-form" id="heroForm">
-              <label class="full">
-                <span>colagem principal</span>
-                <input name="image" placeholder="assets/escrivaninha-collage.png" required />
-              </label>
-              <label class="full">
-                <span>descrição da colagem principal</span>
-                <input name="alt" required />
-              </label>
-              <label class="full">
-                <span>imagem lateral 1</span>
-                <input name="sideImageOne" placeholder="assets/hero-side-1.png" required />
-              </label>
-              <label class="full">
-                <span>descrição da imagem lateral 1</span>
-                <input name="sideAltOne" required />
-              </label>
-              <label class="full">
-                <span>imagem lateral 2</span>
-                <input name="sideImageTwo" placeholder="assets/hero-side-2.png" required />
-              </label>
-              <label class="full">
-                <span>descrição da imagem lateral 2</span>
-                <input name="sideAltTwo" required />
-              </label>
-              <div class="admin-actions">
-                <button class="button primary" type="submit">salvar imagens</button>
-                <p class="admin-status" id="heroStatus" role="status" aria-live="polite"></p>
-              </div>
-            </form>
           </section>
 
           <section class="admin-card" aria-labelledby="passwordAdminTitle">
@@ -115,6 +73,24 @@
         </div>
 
         <div>
+          <section class="admin-card" aria-labelledby="quickPagesTitle">
+            <h2 id="quickPagesTitle">editar páginas</h2>
+            <nav class="admin-link-list" aria-label="atalhos para edições especiais">
+              <a href="admin-imagens.html">
+                <strong>imagens iniciais</strong>
+                <span>trocar colagem e imagens laterais da tela principal</span>
+              </a>
+              <a href="admin-extras.html">
+                <strong>páginas de extras</strong>
+                <span>editar capas, textos e publicações dos extras</span>
+              </a>
+              <a href="admin-comprar.html">
+                <strong>onde comprar</strong>
+                <span>adicionar e atualizar livros físicos e digitais</span>
+              </a>
+            </nav>
+          </section>
+
           <section class="admin-card" aria-labelledby="diaryAdminTitle">
             <h2 id="diaryAdminTitle">novo bilhete</h2>
             <form class="admin-form" id="diaryForm">
@@ -135,16 +111,6 @@
               </div>
             </form>
             <div class="admin-list" id="diaryAdminList"></div>
-          </section>
-
-          <section class="admin-card" aria-labelledby="extrasAdminTitle">
-            <h2 id="extrasAdminTitle">páginas de extras</h2>
-            <div class="admin-list" id="extrasAdminList"></div>
-          </section>
-
-          <section class="admin-card" aria-labelledby="purchaseAdminTitle">
-            <h2 id="purchaseAdminTitle">onde comprar</h2>
-            <div class="admin-list" id="purchaseAdminList"></div>
           </section>
 
           <section class="admin-card" aria-labelledby="musicAdminTitle">
@@ -176,7 +142,11 @@
       </div>
     </main>
 
-    <script src="data.js?v=20260702g"></script>
-    <script src="admin.js?v=20260702g"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js?v=20260703h"></script>
+    <script src="data.js?v=20260704d"></script>
+    <script src="admin.js?v=20260704f"></script>
   </body>
 </html>

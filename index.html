@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
@@ -8,7 +8,7 @@
       name="description"
       content="Um cantinho acolhedor para leitoras acompanharem a escrita, deixarem cartas e descobrirem extras do universo de Flora Laet."
     />
-    <link rel="stylesheet" href="styles.css?v=20260702i" />
+    <link rel="stylesheet" href="styles.css?v=20260704a" />
   </head>
   <body>
     <div class="welcome-screen" id="welcomeScreen" aria-label="Boas-vindas">
@@ -76,6 +76,7 @@
                 <span>Oi<span class="sparkle" aria-hidden="true">✧</span> leitora,</span>
                 <strong>que bom te ver aqui</strong>
               </h1>
+              <img class="welcome-chibi" src="assets/chibi-flora.png" alt="" aria-hidden="true" />
             </div>
 
             <div class="hero-gallery" aria-label="Imagens da página inicial">
@@ -123,11 +124,7 @@
                 </div>
                 <div>
                   <dt>capítulo atual</dt>
-                  <dd><span id="currentChapter">17</span> de <span id="totalChapters">27</span></dd>
-                </div>
-                <div>
-                  <dt>próximo marco</dt>
-                  <dd id="nextMilestone">capítulo 18</dd>
+                  <dd id="currentChapter">17</dd>
                 </div>
               </dl>
             </article>
@@ -149,9 +146,6 @@
               <div>
                 <h2 id="muralTitle">mural dos leitores</h2>
               </div>
-              <button class="button tape-button" type="button" id="focusMessageButton">
-                ✎ escrever mensagem
-              </button>
             </div>
 
             <form class="letter-form" id="letterForm">
@@ -229,10 +223,30 @@
               <h2>fique por dentro das novidades! ✉</h2>
               <p>receba em primeira mão sobre novos capítulos, conteúdos exclusivos e bastidores.</p>
             </div>
-            <form>
-              <input type="email" placeholder="seu melhor e-mail" aria-label="Seu melhor e-mail" />
+            <form
+              id="newsletterForm"
+              action="https://docs.google.com/forms/d/e/1FAIpQLSf9cNB2caKdRu4iI5kTdqdTlOVGVRezRLguevNPSMw6rXGfyA/formResponse"
+              method="POST"
+              target="newsletterFrame"
+            >
+              <input
+                type="email"
+                name="entry.1516177968"
+                placeholder="seu melhor e-mail"
+                aria-label="Seu melhor e-mail"
+                required
+              />
+              <input type="hidden" name="fvv" value="1" />
+              <input type="hidden" name="pageHistory" value="0" />
               <button class="button primary" type="submit">quero receber!</button>
+              <p class="newsletter-status" id="newsletterStatus" role="status" aria-live="polite"></p>
             </form>
+            <iframe
+              class="hidden-frame"
+              name="newsletterFrame"
+              title="Envio da newsletter"
+              aria-hidden="true"
+            ></iframe>
           </section>
         </main>
 
@@ -243,7 +257,11 @@
       </div>
     </div>
 
-    <script src="data.js?v=20260702g"></script>
-    <script src="app.js?v=20260702g"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js?v=20260703h"></script>
+    <script src="data.js?v=20260703g"></script>
+    <script src="app.js?v=20260704e"></script>
   </body>
 </html>

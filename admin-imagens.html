@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Imagens iniciais | Painel da Flora</title>
+    <link rel="stylesheet" href="styles.css?v=20260704d" />
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell" id="adminRoot">
+      <header class="admin-header">
+        <h1>imagens<br />iniciais</h1>
+        <div class="auth-actions">
+          <a class="button ghost" href="admin.html">painel</a>
+          <a class="button ghost" href="index.html">ver site</a>
+          <button class="button primary" id="logoutButton" type="button">sair</button>
+        </div>
+      </header>
+
+      <div class="admin-single-column">
+        <section class="admin-card" aria-labelledby="heroAdminTitle">
+          <h2 id="heroAdminTitle">imagens da tela inicial</h2>
+          <p class="admin-helper">
+            Cole links diretos de imagem. Links de pin do Pinterest abrem uma página, então não aparecem como foto.
+          </p>
+          <form class="admin-form" id="heroForm">
+            <label class="full">
+              <span>link da colagem principal</span>
+              <input name="image" placeholder="cole um link direto da imagem (.jpg, .png ou .webp)" required />
+            </label>
+            <label class="full">
+              <span>link da imagem lateral 1</span>
+              <input name="sideImageOne" placeholder="cole um link direto da imagem (.jpg, .png ou .webp)" required />
+            </label>
+            <label class="full">
+              <span>link da imagem lateral 2</span>
+              <input name="sideImageTwo" placeholder="cole um link direto da imagem (.jpg, .png ou .webp)" required />
+            </label>
+            <div class="admin-actions">
+              <button class="button primary" type="submit">salvar imagens</button>
+              <p class="admin-status" id="heroStatus" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js?v=20260703h"></script>
+    <script src="data.js?v=20260704d"></script>
+    <script src="admin.js?v=20260704f"></script>
+  </body>
+</html>

@@ -7,7 +7,7 @@ Primeira versao do site para leitoras, baseada no briefing do chat compartilhado
 - Tela de boas-vindas com animacao de pena escrevendo e opcao de nao mostrar novamente.
 - Pagina inicial com progresso de `Herdeiros de Mayfair III`.
 - Imagem inicial editavel pelo painel da autora.
-- Mural publico simulado no navegador, com nome, emoji, mensagem e respostas.
+- Mural publico com nome, emoji, mensagem e respostas, pronto para sincronizar com Firebase.
 - Diario com bilhetes curtos no estilo "Tumblr moderno".
 - Extras fixos e clicaveis: ilustracoes, mapas, arvore genealogica e cenas extras.
 - Cada pagina de extra permite publicar varios itens internos pelo painel.
@@ -15,7 +15,8 @@ Primeira versao do site para leitoras, baseada no briefing do chat compartilhado
 - Card lateral com playlist do Spotify, editavel pelo painel.
 - Login em `login.html` e painel em `admin.html`.
 - Painel para atualizar progresso, trocar senha, publicar bilhetes, editar extras, cadastrar livros e responder ao mural.
-- Dados salvos localmente no navegador usando `localStorage`.
+- Dados salvos localmente enquanto o Firebase nao estiver configurado.
+- Integracao preparada com Firebase Auth e Firestore para salvar progresso, diario, extras, livros e mural na nuvem.
 
 ## Como testar
 
@@ -23,6 +24,6 @@ Abra `index.html` no navegador ou rode um servidor local simples dentro desta pa
 
 Senha inicial do painel: `flora2026`
 
-## Proximo passo natural
+## Firebase
 
-Quando esta primeira experiencia estiver aprovada, o mural, o diario, os extras e a barra de progresso podem ser ligados a um banco de dados real para funcionar online para todas as leitoras.
+Para ativar a base online, siga o guia em `FIREBASE_SETUP.md` e preencha `firebase-config.js`.
