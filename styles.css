@@ -712,6 +712,24 @@ img {
   margin-bottom: 20px;
 }
 
+.extras-section .section-title-row,
+.buy-section .section-title-row {
+  position: relative;
+  justify-content: center;
+  text-align: center;
+}
+
+.extras-section .section-title-row > div,
+.buy-section .section-title-row > div {
+  margin-inline: auto;
+}
+
+.extras-section .section-title-row a {
+  position: absolute;
+  top: 8px;
+  right: 0;
+}
+
 .button {
   display: inline-flex;
   justify-content: center;
@@ -894,6 +912,28 @@ textarea:focus {
 
 .buy-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.extras-section .extras-grid {
+  max-width: 860px;
+  margin-inline: auto;
+  grid-template-columns: repeat(3, minmax(0, 260px));
+  justify-content: center;
+}
+
+.buy-section .buy-grid {
+  max-width: 760px;
+  margin-inline: auto;
+  grid-template-columns: repeat(2, minmax(220px, 340px));
+  justify-content: center;
+}
+
+.buy-section .buy-card {
+  min-height: 0;
+}
+
+.buy-section .buy-card img {
+  aspect-ratio: 16 / 10;
 }
 
 .extra-card,
@@ -1102,6 +1142,147 @@ textarea:focus {
 .book-card .button {
   width: fit-content;
   margin-top: 8px;
+}
+
+.detail-image-button {
+  grid-row: 1 / span 4;
+  display: block;
+  width: 92px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.detail-image-button img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 5px solid #fffdf7;
+  border-radius: 5px;
+  box-shadow: 0 10px 22px rgba(49, 31, 24, 0.12);
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(24, 21, 22, 0.72);
+}
+
+.image-lightbox[hidden] {
+  display: none;
+}
+
+.image-lightbox img {
+  display: block;
+  max-width: min(92vw, 980px);
+  max-height: 84vh;
+  object-fit: contain;
+  border: 10px solid #fffdf7;
+  border-radius: 6px;
+  background: #fffdf7;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+}
+
+.image-lightbox-close {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--lilac);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.lightbox-open {
+  overflow: hidden;
+}
+
+.purchase-detail-page .detail-card {
+  grid-template-columns: minmax(220px, 0.38fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.purchase-detail-page .detail-card > img {
+  position: sticky;
+  top: 26px;
+  aspect-ratio: 4 / 5;
+}
+
+.purchase-detail-page .detail-card h1 {
+  max-width: none;
+  font-size: clamp(2.8rem, 5vw, 4.6rem);
+}
+
+.purchase-detail-page .book-list {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.purchase-detail-page .book-card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 250, 242, 0.86);
+  box-shadow: 0 12px 28px rgba(49, 31, 24, 0.08);
+}
+
+.purchase-detail-page .book-card img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-width: 7px;
+}
+
+.purchase-detail-page .book-card p {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.purchase-detail-page .book-card .button {
+  margin-top: auto;
+}
+
+.scroll-top-button {
+  position: fixed;
+  right: 16px;
+  bottom: 22px;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--lilac);
+  box-shadow: 5px 5px 0 rgba(248, 214, 224, 0.95);
+  cursor: pointer;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.scroll-top-button.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .notes-stream {
@@ -1333,6 +1514,16 @@ textarea:focus {
   font-size: 1rem;
 }
 
+.admin-list h3.admin-section-heading {
+  width: fit-content;
+  margin-bottom: 16px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: var(--lilac);
+  box-shadow: 5px 5px 0 rgba(248, 214, 224, 0.78);
+  font-size: 1.06rem;
+}
+
 .admin-list p {
   margin: 0 0 10px;
   color: var(--muted);
@@ -1392,10 +1583,12 @@ textarea:focus {
     position: static;
     min-height: auto;
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr;
     gap: 14px 22px;
     align-items: center;
+    justify-items: center;
     padding: 22px;
+    text-align: center;
   }
 
   .rail-bio,
@@ -1408,11 +1601,14 @@ textarea:focus {
   .rail-nav {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
     margin: 0;
   }
 
   .script-logo {
     font-size: 2.35rem;
+    text-align: center;
   }
 
   .hero-board,
@@ -1420,8 +1616,18 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
+  .welcome-copy {
+    justify-self: center;
+    text-align: center;
+  }
+
+  .welcome-copy h1 strong {
+    max-width: none;
+  }
+
   .hero-gallery {
-    justify-self: start;
+    justify-self: center;
+    width: min(100%, 560px);
   }
 
   .message-grid,
@@ -1477,7 +1683,12 @@ textarea:focus {
   .admin-header,
   .site-footer {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+  }
+
+  .extras-section .section-title-row a {
+    position: static;
+    margin-top: 8px;
   }
 
   .welcome-copy {
@@ -1496,11 +1707,26 @@ textarea:focus {
 
   .hero-gallery {
     grid-template-columns: 1fr;
-    width: min(100%, 340px);
+    width: 100%;
+  }
+
+  .hero-photo img {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 5;
   }
 
   .hero-side-photos {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .buy-section .buy-grid {
+    max-width: 360px;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-photo-small img {
+    aspect-ratio: 1 / 1;
   }
 
   .progress-sheet,
@@ -1530,6 +1756,23 @@ textarea:focus {
   .book-card img {
     grid-row: auto;
     width: min(170px, 100%);
+  }
+
+  .detail-image-button {
+    grid-row: auto;
+    width: min(220px, 100%);
+  }
+
+  .detail-image-button img {
+    width: 100%;
+  }
+
+  .purchase-detail-page .detail-card {
+    grid-template-columns: 1fr;
+  }
+
+  .purchase-detail-page .detail-card > img {
+    position: static;
   }
 
   .progress-facts {

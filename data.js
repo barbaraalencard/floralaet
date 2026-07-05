@@ -234,9 +234,10 @@
 
   function normalizeExtras(extras) {
     const incoming = Array.isArray(extras) ? extras : [];
+    const activeDefaults = defaultExtras.filter((extra) => extra.id !== "mapas");
 
-    return defaultExtras.map((fallback, index) => {
-      const stored = incoming.find((item) => item.id === fallback.id) || incoming[index] || {};
+    return activeDefaults.map((fallback) => {
+      const stored = incoming.find((item) => item.id === fallback.id) || {};
       return {
         ...fallback,
         ...stored,

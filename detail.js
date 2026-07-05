@@ -26,6 +26,83 @@ function renderEmpty(target, text) {
   target.append(empty);
 }
 
+function openImageViewer(src, alt) {
+  const overlay = document.querySelector("#imageLightbox");
+  const image = document.querySelector("#imageLightboxImage");
+  if (!overlay || !image) return;
+
+  image.src = src || fallbackImage;
+  image.alt = alt || "";
+  overlay.hidden = false;
+  document.body.classList.add("lightbox-open");
+}
+
+function setupImageViewer() {
+  if (document.querySelector("#imageLightbox")) return;
+
+  const overlay = createElement("div", "image-lightbox");
+  overlay.id = "imageLightbox";
+  overlay.hidden = true;
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Imagem ampliada");
+
+  const close = createElement("button", "image-lightbox-close", "fechar");
+  close.type = "button";
+  const image = document.createElement("img");
+  image.id = "imageLightboxImage";
+  image.alt = "";
+
+  overlay.append(close, image);
+  document.body.append(overlay);
+
+  function closeViewer() {
+    overlay.hidden = true;
+    document.body.classList.remove("lightbox-open");
+  }
+
+  close.addEventListener("click", closeViewer);
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) closeViewer();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !overlay.hidden) closeViewer();
+  });
+}
+
+function createZoomableImage(src, alt) {
+  const button = document.createElement("button");
+  button.className = "detail-image-button";
+  button.type = "button";
+  button.setAttribute("aria-label", "abrir imagem em tamanho maior");
+
+  const img = document.createElement("img");
+  img.src = src || fallbackImage;
+  img.alt = alt || "";
+
+  button.append(img);
+  button.addEventListener("click", () => openImageViewer(img.src, img.alt));
+  return button;
+}
+
+function setupScrollTopButton() {
+  if (document.querySelector("#scrollTopButton")) return;
+
+  const button = createElement("button", "scroll-top-button", "↑");
+  button.id = "scrollTopButton";
+  button.type = "button";
+  button.setAttribute("aria-label", "Subir para o topo");
+  button.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  document.body.append(button);
+
+  function updateVisibility() {
+    button.classList.toggle("visible", window.scrollY > 420);
+  }
+
+  updateVisibility();
+  window.addEventListener("scroll", updateVisibility, { passive: true });
+}
+
 function renderExtraItems(extra) {
   const list = document.querySelector("#detailItems");
   if (!list) return;
@@ -39,15 +116,14 @@ function renderExtraItems(extra) {
 
   extra.items.forEach((item) => {
     const article = createElement("article", "detail-item-card");
-    const img = document.createElement("img");
-    img.src = item.image || fallbackImage;
-    img.alt = item.title || "";
-
+    const imageButton = createZoomableImage(item.image, item.title);
     const title = createElement("h2", null, item.title);
-    const description = createElement("p", "detail-item-description", item.description);
-    const content = createElement("p", null, item.content);
+    const description = item.description ? createElement("p", "detail-item-description", item.description) : null;
+    const content = item.content ? createElement("p", null, item.content) : null;
 
-    article.append(img, title, description, content);
+    article.append(imageButton, title);
+    if (description) article.append(description);
+    if (content) article.append(content);
     list.append(article);
   });
 }
@@ -136,10 +212,14 @@ function renderPurchasePage(purchaseType) {
 const { extraId, purchaseType } = document.body.dataset;
 
 function renderCurrentPage() {
+  document.body.classList.toggle("extra-detail-page", Boolean(extraId));
+  document.body.classList.toggle("purchase-detail-page", Boolean(purchaseType));
   if (extraId) renderExtraPage(extraId);
   if (purchaseType) renderPurchasePage(purchaseType);
 }
 
+setupImageViewer();
+setupScrollTopButton();
 renderCurrentPage();
 
 window.FloraData.subscribeState((nextState) => {

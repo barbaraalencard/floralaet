@@ -178,6 +178,7 @@ function bootAdmin() {
   }
 
   function renderExtraItemForm(extra, item) {
+    const textRequired = extra.id !== "ilustracoes";
     const article = createElement("article");
     article.append(createElement("h3", null, item.title));
 
@@ -187,8 +188,8 @@ function bootAdmin() {
     form.append(
       buildTextInput("title", item.title, "título do item"),
       buildTextInput("image", item.image, "imagem do item"),
-      buildTextarea("description", item.description, "descrição curta"),
-      buildTextarea("content", item.content, "texto/conteúdo"),
+      buildTextarea("description", item.description, "descrição curta", textRequired),
+      buildTextarea("content", item.content, "texto/conteúdo", textRequired),
     );
 
     const remove = createElement("button", "button ghost", "remover item");
@@ -207,8 +208,9 @@ function bootAdmin() {
     extrasAdminList.replaceChildren();
 
     state.extras.forEach((extra) => {
+      const textRequired = extra.id !== "ilustracoes";
       const article = createElement("article");
-      article.append(createElement("h3", null, extra.title));
+      article.append(createElement("h3", "admin-section-heading", extra.title));
 
       const form = createElement("form", "admin-form");
       form.dataset.extraId = extra.id;
@@ -216,8 +218,8 @@ function bootAdmin() {
         buildTextInput("label", extra.label, "etiqueta"),
         buildTextInput("title", extra.title, "título da página"),
         buildTextInput("image", extra.image, "capa da página"),
-        buildTextarea("description", extra.description, "descrição curta"),
-        buildTextarea("content", extra.content, "texto de abertura"),
+        buildTextarea("description", extra.description, "descrição curta", textRequired),
+        buildTextarea("content", extra.content, "texto de abertura", textRequired),
       );
 
       const lockedLabel = createElement("label");
@@ -238,8 +240,8 @@ function bootAdmin() {
       addForm.append(
         buildTextInput("title", "", "novo título"),
         buildTextInput("image", "assets/escrivaninha-collage.png", "imagem"),
-        buildTextarea("description", "", "descrição curta"),
-        buildTextarea("content", "", "texto/conteúdo"),
+        buildTextarea("description", "", "descrição curta", textRequired),
+        buildTextarea("content", "", "texto/conteúdo", textRequired),
         buildActions("publicar novo item"),
       );
       subsection.append(addForm);

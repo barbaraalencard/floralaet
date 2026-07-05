@@ -77,6 +77,24 @@ function setImageSource(image, src, fallback, alt) {
   image.alt = alt || "";
 }
 
+function setupScrollTopButton() {
+  if (document.querySelector("#scrollTopButton")) return;
+
+  const button = createElement("button", "scroll-top-button", "↑");
+  button.id = "scrollTopButton";
+  button.type = "button";
+  button.setAttribute("aria-label", "Subir para o topo");
+  button.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  document.body.append(button);
+
+  function updateVisibility() {
+    button.classList.toggle("visible", window.scrollY > 420);
+  }
+
+  updateVisibility();
+  window.addEventListener("scroll", updateVisibility, { passive: true });
+}
+
 function renderHero() {
   if (!heroImage || !siteState.hero) return;
 
@@ -384,6 +402,7 @@ renderDiary();
 renderExtras();
 renderBuyLinks();
 renderMessages();
+setupScrollTopButton();
 showWelcomeIfNeeded();
 updateVisitSummary();
 
