@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Imagens iniciais | Painel da Flora</title>
-    <link rel="stylesheet" href="styles.css?v=20260704h" />
+    <link rel="stylesheet" href="styles.css?v=20260704m" />
   </head>
   <body class="admin-page">
     <main class="admin-shell" id="adminRoot">
@@ -21,20 +21,35 @@
         <section class="admin-card" aria-labelledby="heroAdminTitle">
           <h2 id="heroAdminTitle">imagens da tela inicial</h2>
           <p class="admin-helper">
-            Cole links diretos de imagem. Links de pin do Pinterest abrem uma página, então não aparecem como foto.
+            Cole links diretos de imagem. Links de pin do Pinterest abrem uma pÃ¡gina, entÃ£o nÃ£o aparecem como foto.
           </p>
           <form class="admin-form" id="heroForm">
-            <label class="full">
+            <label class="full admin-image-field">
               <span>link da colagem principal</span>
               <input name="image" placeholder="cole um link direto da imagem (.jpg, .png ou .webp)" required />
+              <select name="fit">
+                <option value="cover">preencher espaÃ§o</option>
+                <option value="contain">mostrar imagem inteira</option>
+              </select>
+              <img class="admin-image-preview" alt="" />
             </label>
-            <label class="full">
+            <label class="full admin-image-field">
               <span>link da imagem lateral 1</span>
               <input name="sideImageOne" placeholder="cole um link direto da imagem (.jpg, .png ou .webp)" required />
+              <select name="sideFitOne">
+                <option value="cover">preencher espaÃ§o</option>
+                <option value="contain">mostrar imagem inteira</option>
+              </select>
+              <img class="admin-image-preview" alt="" />
             </label>
-            <label class="full">
+            <label class="full admin-image-field">
               <span>link da imagem lateral 2</span>
               <input name="sideImageTwo" placeholder="cole um link direto da imagem (.jpg, .png ou .webp)" required />
+              <select name="sideFitTwo">
+                <option value="cover">preencher espaÃ§o</option>
+                <option value="contain">mostrar imagem inteira</option>
+              </select>
+              <img class="admin-image-preview" alt="" />
             </label>
             <div class="admin-actions">
               <button class="button primary" type="submit">salvar imagens</button>
@@ -49,7 +64,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js?v=20260703h"></script>
-    <script src="data.js?v=20260704h"></script>
-    <script src="admin.js?v=20260704h"></script>
+    <script src="data.js?v=20260704k"></script>
+    <script src="admin.js?v=20260704k"></script>
   </body>
 </html>
+
+
+

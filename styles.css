@@ -10,6 +10,7 @@
   --rose-paper: #f3aeba;
   --lilac: #e7d9f3;
   --lilac-deep: #d8c2ea;
+  --photo-frame: #fff8ee;
   --sage: #8a9c88;
   --gold: #cf9e55;
   --line: rgba(24, 21, 22, 0.14);
@@ -60,6 +61,11 @@ img {
   max-width: 100%;
 }
 
+img[data-fit="contain"] {
+  object-fit: contain !important;
+  background: rgba(255, 250, 242, 0.78);
+}
+
 .welcome-screen {
   position: fixed;
   inset: 0;
@@ -69,7 +75,8 @@ img {
   padding: 24px;
   background:
     linear-gradient(rgba(251, 245, 236, 0.78), rgba(251, 245, 236, 0.94)),
-    url("assets/escrivaninha-collage.png") center / cover;
+    url("assets/fundo-coracoes-estrelas.png") 48px 62px / 620px 620px repeat,
+    var(--paper);
   transition: opacity 360ms ease, visibility 360ms ease;
 }
 
@@ -284,7 +291,7 @@ img {
   width: 154px;
   margin: 0 0 26px;
   padding: 8px 8px 22px;
-  background: #fffdf7;
+  background: var(--photo-frame);
   box-shadow: 0 12px 28px rgba(49, 31, 24, 0.14);
   transform: rotate(-1deg);
 }
@@ -464,7 +471,7 @@ img {
   width: 100%;
   margin: 0;
   padding: 8px 8px 18px;
-  background: #fffdf7;
+  background: var(--photo-frame);
   box-shadow: 0 16px 35px rgba(49, 31, 24, 0.16);
   transform: rotate(0.5deg);
 }
@@ -1057,7 +1064,7 @@ textarea:focus {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  border: 10px solid #fffdf7;
+  border: 10px solid var(--photo-frame);
   border-radius: 6px;
   box-shadow: 0 17px 34px rgba(49, 31, 24, 0.16);
 }
@@ -1113,7 +1120,7 @@ textarea:focus {
   width: 92px;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border: 5px solid #fffdf7;
+  border: 5px solid var(--photo-frame);
   border-radius: 5px;
   box-shadow: 0 10px 22px rgba(49, 31, 24, 0.12);
 }
@@ -1159,7 +1166,7 @@ textarea:focus {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border: 5px solid #fffdf7;
+  border: 5px solid var(--photo-frame);
   border-radius: 5px;
   box-shadow: 0 10px 22px rgba(49, 31, 24, 0.12);
 }
@@ -1183,9 +1190,9 @@ textarea:focus {
   max-width: min(92vw, 980px);
   max-height: 84vh;
   object-fit: contain;
-  border: 10px solid #fffdf7;
+  border: 10px solid var(--photo-frame);
   border-radius: 6px;
-  background: #fffdf7;
+  background: var(--photo-frame);
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
 }
 
@@ -1346,6 +1353,22 @@ textarea:focus {
 
 .site-footer p {
   margin: 0;
+}
+
+.site-counters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.site-counters strong {
+  color: var(--rose);
+}
+
+.about-card img {
+  background: rgba(255, 250, 242, 0.78);
 }
 
 .auth-page,
@@ -1522,6 +1545,30 @@ textarea:focus {
   background: var(--lilac);
   box-shadow: 5px 5px 0 rgba(248, 214, 224, 0.78);
   font-size: 1.06rem;
+}
+
+.admin-image-field {
+  gap: 10px;
+}
+
+.admin-image-field select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: rgba(255, 250, 242, 0.92);
+}
+
+.admin-image-preview {
+  display: block;
+  width: min(220px, 100%);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 6px solid var(--photo-frame);
+  border-radius: 6px;
+  background: rgba(255, 250, 242, 0.78);
+  box-shadow: 0 10px 22px rgba(49, 31, 24, 0.1);
 }
 
 .admin-list p {

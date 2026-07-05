@@ -5,6 +5,7 @@ const {
   loadState,
   subscribeMessages,
   subscribeState,
+  trackCounters,
   welcomeKey,
   lastVisitKey,
   createId,
@@ -27,6 +28,8 @@ const spotifyEmbed = document.querySelector("#spotifyEmbed");
 const spotifyCaption = document.querySelector("#spotifyCaption");
 const newsletterForm = document.querySelector("#newsletterForm");
 const newsletterStatus = document.querySelector("#newsletterStatus");
+const onlineCount = document.querySelector("#onlineCount");
+const visitCount = document.querySelector("#visitCount");
 const heroSideImages = [
   document.querySelector("#heroSideImageOne"),
   document.querySelector("#heroSideImageTwo"),
@@ -68,13 +71,18 @@ function renderBook() {
   if (fill) fill.style.setProperty("--progress", `${progress}%`);
 }
 
-function setImageSource(image, src, fallback, alt) {
+function imageFit(value) {
+  return value === "contain" ? "contain" : "cover";
+}
+
+function setImageSource(image, src, fallback, alt, fit = "cover") {
   image.onerror = () => {
     image.onerror = null;
     image.src = fallback;
   };
   image.src = src || fallback;
   image.alt = alt || "";
+  image.dataset.fit = imageFit(fit);
 }
 
 function setupScrollTopButton() {
@@ -103,6 +111,7 @@ function renderHero() {
     siteState.hero.image,
     "assets/escrivaninha-collage.png",
     siteState.hero.alt || "Imagem escolhida pela Flora para a página inicial",
+    siteState.hero.fit,
   );
 
   const sideFallbacks = [
@@ -121,7 +130,7 @@ function renderHero() {
     if (!image) return;
 
     const data = sideImages[index] || sideFallbacks[index];
-    setImageSource(image, data.image, sideFallbacks[index].image, data.alt || sideFallbacks[index].alt);
+    setImageSource(image, data.image, sideFallbacks[index].image, data.alt || sideFallbacks[index].alt, data.fit);
   });
 }
 
@@ -164,8 +173,7 @@ function renderExtras() {
     article.className = "extra-card";
     article.href = extra.locked ? "#extras" : extra.page || "#";
     const img = document.createElement("img");
-    img.src = extra.image || "assets/escrivaninha-collage.png";
-    img.alt = "";
+    setImageSource(img, extra.image, "assets/escrivaninha-collage.png", "", extra.fit);
 
     const label = createElement("span", "extra-label", extra.label);
     const title = createElement("h3", null, extra.title);
@@ -202,8 +210,7 @@ function renderBuyLinks() {
     card.href = item.key === "physical" ? "comprar-fisicos.html" : "comprar-digitais.html";
 
     const img = document.createElement("img");
-    img.src = data.image || "assets/escrivaninha-collage.png";
-    img.alt = "";
+    setImageSource(img, data.image, "assets/escrivaninha-collage.png", "", data.fit);
 
     const label = createElement("span", "extra-label", item.label);
     const title = createElement("h3", null, data.title);
@@ -307,6 +314,11 @@ function updateVisitSummary() {
   return message;
 }
 
+function renderCounters({ online, visits }) {
+  if (onlineCount) onlineCount.textContent = online === null ? "..." : String(online);
+  if (visitCount) visitCount.textContent = visits === null ? "..." : String(visits);
+}
+
 emojiButtons.forEach((button) => {
   button.addEventListener("click", () => {
     emojiButtons.forEach((item) => item.classList.remove("active"));
@@ -403,6 +415,7 @@ renderExtras();
 renderBuyLinks();
 renderMessages();
 setupScrollTopButton();
+trackCounters(renderCounters);
 showWelcomeIfNeeded();
 updateVisitSummary();
 

@@ -49,11 +49,13 @@ if (adminRoot) {
 function bootAdmin() {
   const bookForm = document.querySelector("#bookForm");
   const heroForm = document.querySelector("#heroForm");
+  const aboutForm = document.querySelector("#aboutForm");
   const passwordForm = document.querySelector("#passwordForm");
   const diaryForm = document.querySelector("#diaryForm");
   const musicForm = document.querySelector("#musicForm");
   const bookStatus = document.querySelector("#bookStatus");
   const heroStatus = document.querySelector("#heroStatus");
+  const aboutStatus = document.querySelector("#aboutStatus");
   const passwordStatus = document.querySelector("#passwordStatus");
   const musicStatus = document.querySelector("#musicStatus");
   const logoutButton = document.querySelector("#logoutButton");
@@ -89,6 +91,76 @@ function bootAdmin() {
     return text.includes("pin.it/") || (text.includes("pinterest.") && text.includes("/pin/"));
   }
 
+  function imageFit(value) {
+    return value === "contain" ? "contain" : "cover";
+  }
+
+  function bindImagePreview(input, select, preview) {
+    if (!input || !preview) return;
+
+    function update() {
+      preview.src = input.value || "assets/escrivaninha-collage.png";
+      preview.dataset.fit = imageFit(select && select.value);
+    }
+
+    if (input.dataset.previewBound === "true") {
+      update();
+      return;
+    }
+
+    input.dataset.previewBound = "true";
+    input.addEventListener("input", update);
+    if (select) select.addEventListener("change", update);
+    update();
+  }
+
+  function buildFitSelect(name, currentValue) {
+    const select = document.createElement("select");
+    select.name = name;
+    select.dataset.imageFit = "true";
+
+    [
+      ["cover", "preencher espaço"],
+      ["contain", "mostrar imagem inteira"],
+    ].forEach(([valueOption, label]) => {
+      const option = document.createElement("option");
+      option.value = valueOption;
+      option.textContent = label;
+      option.selected = imageFit(currentValue) === valueOption;
+      select.append(option);
+    });
+
+    return select;
+  }
+
+  function buildImageField(name, inputValue, labelText, fitName, fitValue, required = true) {
+    const label = createElement("label", "full admin-image-field");
+    const span = createElement("span", null, labelText);
+    const input = document.createElement("input");
+    input.name = name;
+    input.value = inputValue || "";
+    input.required = required;
+    input.placeholder = "cole um link direto da imagem";
+
+    const select = buildFitSelect(fitName, fitValue);
+    const preview = document.createElement("img");
+    preview.className = "admin-image-preview";
+    preview.alt = "";
+
+    label.append(span, input, select, preview);
+    bindImagePreview(input, select, preview);
+    return label;
+  }
+
+  function enhanceStaticImageFields(root = document) {
+    root.querySelectorAll(".admin-image-field").forEach((field) => {
+      const input = field.querySelector("input");
+      const select = field.querySelector("select");
+      const preview = field.querySelector(".admin-image-preview");
+      bindImagePreview(input, select, preview);
+    });
+  }
+
   function fillBookForm() {
     if (!bookForm || !state.book) return;
 
@@ -106,8 +178,22 @@ function bootAdmin() {
     const sideImages = Array.isArray(state.hero.sideImages) ? state.hero.sideImages : [];
 
     heroForm.elements.image.value = state.hero.image;
+    heroForm.elements.fit.value = imageFit(state.hero.fit);
     heroForm.elements.sideImageOne.value = sideImages[0]?.image || "assets/hero-side-1.png";
+    heroForm.elements.sideFitOne.value = imageFit(sideImages[0]?.fit);
     heroForm.elements.sideImageTwo.value = sideImages[1]?.image || "assets/hero-side-2.png";
+    heroForm.elements.sideFitTwo.value = imageFit(sideImages[1]?.fit);
+    enhanceStaticImageFields(heroForm);
+  }
+
+  function fillAboutForm() {
+    if (!aboutForm) return;
+
+    const about = state.about || {};
+    aboutForm.elements.photo.value = about.photo || "assets/chibi-flora.png";
+    aboutForm.elements.photoFit.value = imageFit(about.photoFit || "contain");
+    aboutForm.elements.description.value = about.description || "";
+    enhanceStaticImageFields(aboutForm);
   }
 
   function fillMusicForm() {
@@ -187,7 +273,7 @@ function bootAdmin() {
     form.dataset.extraItemId = item.id;
     form.append(
       buildTextInput("title", item.title, "título do item"),
-      buildTextInput("image", item.image, "imagem do item"),
+      buildImageField("image", item.image, "imagem do item", "fit", item.fit),
       buildTextarea("description", item.description, "descrição curta", textRequired),
       buildTextarea("content", item.content, "texto/conteúdo", textRequired),
     );
@@ -217,7 +303,7 @@ function bootAdmin() {
       form.append(
         buildTextInput("label", extra.label, "etiqueta"),
         buildTextInput("title", extra.title, "título da página"),
-        buildTextInput("image", extra.image, "capa da página"),
+        buildImageField("image", extra.image, "capa da página", "fit", extra.fit),
         buildTextarea("description", extra.description, "descrição curta", textRequired),
         buildTextarea("content", extra.content, "texto de abertura", textRequired),
       );
@@ -239,7 +325,7 @@ function bootAdmin() {
       addForm.dataset.addExtraItem = extra.id;
       addForm.append(
         buildTextInput("title", "", "novo título"),
-        buildTextInput("image", "assets/escrivaninha-collage.png", "imagem"),
+        buildImageField("image", "assets/escrivaninha-collage.png", "imagem", "fit", "cover"),
         buildTextarea("description", "", "descrição curta", textRequired),
         buildTextarea("content", "", "texto/conteúdo", textRequired),
         buildActions("publicar novo item"),
@@ -264,7 +350,7 @@ function bootAdmin() {
     form.dataset.purchaseItemId = book.id;
     form.append(
       buildTextInput("title", book.title, "título do livro"),
-      buildTextInput("image", book.image, "capa do livro"),
+      buildImageField("image", book.image, "capa do livro", "fit", book.fit),
       buildTextInput("link", book.link, "link de compra"),
       buildTextInput("buttonLabel", book.buttonLabel, "texto do botão"),
       buildTextarea("description", book.description, "descrição"),
@@ -297,7 +383,7 @@ function bootAdmin() {
       form.dataset.purchaseId = item.id;
       form.append(
         buildTextInput("title", data.title, "título da página"),
-        buildTextInput("image", data.image, "capa da página"),
+        buildImageField("image", data.image, "capa da página", "fit", data.fit),
         buildTextarea("description", data.description, "descrição da página"),
         buildActions("salvar página", buildOpenLink(item.page)),
       );
@@ -310,7 +396,7 @@ function bootAdmin() {
       addForm.dataset.addPurchaseItem = item.id;
       addForm.append(
         buildTextInput("title", "", "título do livro"),
-        buildTextInput("image", "assets/escrivaninha-collage.png", "capa do livro"),
+        buildImageField("image", "assets/escrivaninha-collage.png", "capa do livro", "fit", "cover"),
         buildTextInput("link", "", "link de compra"),
         buildTextInput("buttonLabel", "comprar", "texto do botão"),
         buildTextarea("description", "", "descrição"),
@@ -404,23 +490,42 @@ function bootAdmin() {
         return;
       }
 
-      state.hero = {
-        image,
-        alt: "Imagem escolhida pela Flora para a página inicial",
-        sideImages: [
-          {
-            image: sideImageOne,
-            alt: "Imagem lateral da página inicial",
-          },
-          {
-            image: sideImageTwo,
-            alt: "Imagem lateral da página inicial",
-          },
-        ],
+    state.hero = {
+      image,
+      fit: imageFit(data.get("fit")),
+      alt: "Imagem escolhida pela Flora para a página inicial",
+      sideImages: [
+        {
+          image: sideImageOne,
+          fit: imageFit(data.get("sideFitOne")),
+          alt: "Imagem lateral da página inicial",
+        },
+        {
+          image: sideImageTwo,
+          fit: imageFit(data.get("sideFitTwo")),
+          alt: "Imagem lateral da página inicial",
+        },
+      ],
       };
 
       saveState(state);
-      flash(heroStatus, "imagens iniciais salvas.");
+    flash(heroStatus, "imagens iniciais salvas.");
+  });
+  }
+
+  if (aboutForm) {
+    aboutForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(aboutForm);
+
+      state.about = {
+        photo: value(data, "photo"),
+        photoFit: imageFit(data.get("photoFit")),
+        description: value(data, "description"),
+      };
+
+      saveState(state);
+      flash(aboutStatus, "sobre a autora salvo.");
     });
   }
 
@@ -495,6 +600,7 @@ function bootAdmin() {
         extra.label = value(data, "label");
         extra.title = value(data, "title");
         extra.image = value(data, "image");
+        extra.fit = imageFit(data.get("fit"));
         extra.description = value(data, "description");
         extra.content = value(data, "content");
         extra.locked = data.get("locked") === "on";
@@ -510,6 +616,7 @@ function bootAdmin() {
             id: createId(),
             title: value(data, "title"),
             image: value(data, "image"),
+            fit: imageFit(data.get("fit")),
             description: value(data, "description"),
             content: value(data, "content"),
           },
@@ -523,9 +630,10 @@ function bootAdmin() {
         const item = extra && extra.items.find((entry) => entry.id === itemForm.dataset.extraItemId);
         if (!item) return;
 
-        item.title = value(data, "title");
-        item.image = value(data, "image");
-        item.description = value(data, "description");
+      item.title = value(data, "title");
+      item.image = value(data, "image");
+      item.fit = imageFit(data.get("fit"));
+      item.description = value(data, "description");
         item.content = value(data, "content");
       }
 
@@ -562,6 +670,7 @@ function bootAdmin() {
 
         purchase.title = value(data, "title");
         purchase.image = value(data, "image");
+        purchase.fit = imageFit(data.get("fit"));
         purchase.description = value(data, "description");
       }
 
@@ -575,6 +684,7 @@ function bootAdmin() {
             id: createId(),
             title: value(data, "title"),
             image: value(data, "image"),
+            fit: imageFit(data.get("fit")),
             link: value(data, "link"),
             buttonLabel: value(data, "buttonLabel"),
             description: value(data, "description"),
@@ -589,9 +699,10 @@ function bootAdmin() {
         const book = purchase && purchase.items.find((item) => item.id === itemForm.dataset.purchaseItemId);
         if (!book) return;
 
-        book.title = value(data, "title");
-        book.image = value(data, "image");
-        book.link = value(data, "link");
+      book.title = value(data, "title");
+      book.image = value(data, "image");
+      book.fit = imageFit(data.get("fit"));
+      book.link = value(data, "link");
         book.buttonLabel = value(data, "buttonLabel");
         book.description = value(data, "description");
       }
@@ -665,6 +776,7 @@ function bootAdmin() {
 
   fillBookForm();
   fillHeroForm();
+  fillAboutForm();
   fillMusicForm();
   renderDiaryAdmin();
   renderExtrasAdmin();
@@ -675,6 +787,7 @@ function bootAdmin() {
     state = nextState;
     fillBookForm();
     fillHeroForm();
+    fillAboutForm();
     fillMusicForm();
     renderDiaryAdmin();
     renderExtrasAdmin();

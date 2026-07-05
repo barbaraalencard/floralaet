@@ -7,11 +7,17 @@
   const passwordKey = "flora-admin-password";
   const cloudStateSeedKey = "flora-cloud-state-seeded";
   const cloudMessagesSeedKey = "flora-cloud-messages-seeded";
+  const visitorIdKey = "flora-visitor-id";
+  const visitCountedKey = "flora-visit-counted";
   const defaultAdminPassword = "flora2026";
 
   function createId() {
     if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
     return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  function normalizeImageFit(value) {
+    return value === "contain" ? "contain" : "cover";
   }
 
   function defaultExtraItem(id, title, description, content) {
@@ -21,6 +27,7 @@
       description,
       content,
       image: "assets/escrivaninha-collage.png",
+      fit: "cover",
     };
   }
 
@@ -33,6 +40,7 @@
       content:
         "Use esta página para reunir ilustrações oficiais, fanarts autorizadas e imagens de referência dos livros.",
       image: "assets/escrivaninha-collage.png",
+      fit: "cover",
       page: "extra-ilustracoes.html",
       locked: false,
       items: [
@@ -52,6 +60,7 @@
       content:
         "Aqui podem entrar mapas, rotas, casas, cidades e pequenos guias geográficos do universo dos livros.",
       image: "assets/escrivaninha-collage.png",
+      fit: "cover",
       page: "extra-mapas.html",
       locked: false,
       items: [
@@ -71,6 +80,7 @@
       content:
         "Esta página fica reservada para árvores genealógicas, laços familiares e relações importantes.",
       image: "assets/escrivaninha-collage.png",
+      fit: "cover",
       page: "extra-arvore.html",
       locked: false,
       items: [
@@ -90,6 +100,7 @@
       content:
         "Guarde aqui cenas deletadas, cartas de personagens, capítulos bônus e pequenos presentes para as leitoras.",
       image: "assets/escrivaninha-collage.png",
+      fit: "cover",
       page: "extra-cenas.html",
       locked: true,
       items: [
@@ -115,17 +126,26 @@
     },
     hero: {
       image: "assets/escrivaninha-collage.png",
+      fit: "cover",
       alt: "Colagem de papéis, fotos e objetos de escrita na escrivaninha",
       sideImages: [
         {
           image: "assets/hero-side-1.png",
+          fit: "cover",
           alt: "Detalhe delicado de papéis e rabiscos da escrivaninha",
         },
         {
           image: "assets/hero-side-2.png",
+          fit: "cover",
           alt: "Detalhe de anotações e flores em clima de romance",
         },
       ],
+    },
+    about: {
+      photo: "assets/chibi-flora.png",
+      photoFit: "contain",
+      description:
+        "Flora Laet escreve romances para fãs de amores caóticos, finais que aquecem o coração e personagens que parecem morar na nossa cabeceira.",
     },
     music: {
       title: "no fone agora",
@@ -158,12 +178,14 @@
         title: "Livros físicos",
         description: "Links para comprar os livros impressos da Flora.",
         image: "assets/escrivaninha-collage.png",
+        fit: "cover",
         items: [
           {
             id: "fisicos-1",
             title: "Livro físico 1",
             description: "Edite este card com o nome, capa e link do livro físico.",
             image: "assets/escrivaninha-collage.png",
+            fit: "cover",
             link: "https://example.com/livros-fisicos",
             buttonLabel: "comprar físico",
           },
@@ -173,12 +195,14 @@
         title: "E-books",
         description: "Links para comprar as versões digitais dos livros.",
         image: "assets/escrivaninha-collage.png",
+        fit: "cover",
         items: [
           {
             id: "digitais-1",
             title: "E-book 1",
             description: "Edite este card com o nome, capa e link do e-book.",
             image: "assets/escrivaninha-collage.png",
+            fit: "cover",
             link: "https://example.com/ebooks",
             buttonLabel: "comprar e-book",
           },
@@ -229,6 +253,7 @@
       description: item.description || "",
       content: item.content || "",
       image: item.image || "assets/escrivaninha-collage.png",
+      fit: normalizeImageFit(item.fit),
     }));
   }
 
@@ -243,6 +268,7 @@
         ...stored,
         id: fallback.id,
         page: fallback.page,
+        fit: normalizeImageFit(stored.fit || fallback.fit),
         items: normalizeExtraItems(stored.items, fallback.items),
       };
     });
@@ -255,6 +281,7 @@
         title: item.title || "Novo livro",
         description: item.description || "",
         image: item.image || "assets/escrivaninha-collage.png",
+        fit: normalizeImageFit(item.fit),
         link: item.link || "#",
         buttonLabel: item.buttonLabel || "comprar",
       }));
@@ -267,6 +294,7 @@
           title: storedData.title || fallbackData.title,
           description: storedData.description || fallbackData.description,
           image: storedData.image || fallbackData.image,
+          fit: normalizeImageFit(storedData.fit || fallbackData.fit),
           link: storedData.link,
           buttonLabel: storedData.buttonLabel || "comprar",
         },
@@ -286,6 +314,7 @@
       title: storedData.title || fallback.title,
       description: storedData.description || fallback.description,
       image: storedData.image || fallback.image,
+      fit: normalizeImageFit(storedData.fit || fallback.fit),
       items: normalizePurchaseItems(storedData, fallback),
     };
   }
@@ -299,13 +328,27 @@
       ...defaultState.hero,
       ...storedHero,
       image: storedHero.image || defaultState.hero.image,
+      fit: normalizeImageFit(storedHero.fit || defaultState.hero.fit),
       alt: storedHero.alt || defaultState.hero.alt,
       sideImages: fallbackSideImages.map((fallback, index) => ({
         ...fallback,
         ...(incomingSideImages[index] || {}),
         image: (incomingSideImages[index] && incomingSideImages[index].image) || fallback.image,
+        fit: normalizeImageFit((incomingSideImages[index] && incomingSideImages[index].fit) || fallback.fit),
         alt: (incomingSideImages[index] && incomingSideImages[index].alt) || fallback.alt,
       })),
+    };
+  }
+
+  function normalizeAbout(stored) {
+    const storedAbout = (stored && stored.about) || {};
+
+    return {
+      ...defaultState.about,
+      ...storedAbout,
+      photo: storedAbout.photo || defaultState.about.photo,
+      photoFit: normalizeImageFit(storedAbout.photoFit || defaultState.about.photoFit),
+      description: storedAbout.description || defaultState.about.description,
     };
   }
 
@@ -315,6 +358,7 @@
       ...stored,
       book: { ...defaultState.book, ...(stored && stored.book) },
       hero: normalizeHero(stored),
+      about: normalizeAbout(stored),
       music: { ...defaultState.music, ...(stored && stored.music) },
       purchase: {
         physical: normalizePurchaseCategory(stored, "physical"),
@@ -355,6 +399,8 @@
       db,
       stateRef: db.collection("site").doc("state"),
       messagesRef: db.collection("messages"),
+      visitsRef: db.collection("analytics").doc("visits"),
+      presenceRef: db.collection("presence"),
     };
 
     return firebaseService;
@@ -502,6 +548,101 @@
         console.warn("Nao foi possivel excluir a mensagem no Firebase.", error);
         return false;
       });
+  }
+
+  function getVisitorId() {
+    const stored = localStorage.getItem(visitorIdKey);
+    if (stored) return stored;
+
+    const nextId = createId();
+    localStorage.setItem(visitorIdKey, nextId);
+    return nextId;
+  }
+
+  function trackCounters(callback) {
+    const service = initFirebase();
+    if (!service) {
+      callback({ online: null, visits: null });
+      return () => {};
+    }
+
+    const visitorId = getVisitorId();
+    const visitorRef = service.presenceRef.doc(visitorId);
+    let totalVisits = null;
+    let presenceDocs = [];
+
+    function publish() {
+      const now = Date.now();
+      const online = presenceDocs.filter((entry) => now - entry.lastSeen <= 70000).length;
+      callback({ online, visits: totalVisits });
+    }
+
+    function markOnline() {
+      return visitorRef
+        .set(
+          {
+            lastSeen: window.firebase.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        )
+        .catch((error) => {
+          console.warn("Nao foi possivel atualizar presenca.", error);
+        });
+    }
+
+    if (sessionStorage.getItem(visitCountedKey) !== "true") {
+      sessionStorage.setItem(visitCountedKey, "true");
+      service.visitsRef
+        .set(
+          {
+            total: window.firebase.firestore.FieldValue.increment(1),
+            updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        )
+        .catch((error) => {
+          console.warn("Nao foi possivel registrar visita.", error);
+        });
+    }
+
+    markOnline();
+
+    const presenceInterval = window.setInterval(() => {
+      markOnline();
+      publish();
+    }, 25000);
+
+    const unsubscribeVisits = service.visitsRef.onSnapshot(
+      (snapshot) => {
+        totalVisits = snapshot.exists ? Number(snapshot.data().total) || 0 : 0;
+        publish();
+      },
+      (error) => {
+        console.warn("Nao foi possivel acompanhar visitas.", error);
+      },
+    );
+
+    const unsubscribePresence = service.presenceRef.onSnapshot(
+      (snapshot) => {
+        presenceDocs = snapshot.docs.map((document) => {
+          const lastSeen = document.data().lastSeen;
+          return {
+            id: document.id,
+            lastSeen: lastSeen && typeof lastSeen.toMillis === "function" ? lastSeen.toMillis() : 0,
+          };
+        });
+        publish();
+      },
+      (error) => {
+        console.warn("Nao foi possivel acompanhar presenca.", error);
+      },
+    );
+
+    return () => {
+      window.clearInterval(presenceInterval);
+      unsubscribeVisits();
+      unsubscribePresence();
+    };
   }
 
   function subscribeState(callback) {
@@ -684,6 +825,7 @@
     stateKey,
     subscribeMessages,
     subscribeState,
+    trackCounters,
     welcomeKey,
   };
 })();

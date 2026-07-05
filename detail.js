@@ -13,12 +13,17 @@ function setText(selector, value) {
   if (element) element.textContent = value || "";
 }
 
-function setImage(selector, src, alt) {
+function imageFit(value) {
+  return value === "contain" ? "contain" : "cover";
+}
+
+function setImage(selector, src, alt, fit = "cover") {
   const image = document.querySelector(selector);
   if (!image) return;
 
   image.src = src || fallbackImage;
   image.alt = alt || "";
+  image.dataset.fit = imageFit(fit);
 }
 
 function renderEmpty(target, text) {
@@ -70,7 +75,7 @@ function setupImageViewer() {
   });
 }
 
-function createZoomableImage(src, alt) {
+function createZoomableImage(src, alt, fit = "cover") {
   const button = document.createElement("button");
   button.className = "detail-image-button";
   button.type = "button";
@@ -79,6 +84,7 @@ function createZoomableImage(src, alt) {
   const img = document.createElement("img");
   img.src = src || fallbackImage;
   img.alt = alt || "";
+  img.dataset.fit = imageFit(fit);
 
   button.append(img);
   button.addEventListener("click", () => openImageViewer(img.src, img.alt));
@@ -116,7 +122,7 @@ function renderExtraItems(extra) {
 
   extra.items.forEach((item) => {
     const article = createElement("article", "detail-item-card");
-    const imageButton = createZoomableImage(item.image, item.title);
+    const imageButton = createZoomableImage(item.image, item.title, item.fit);
     const title = createElement("h2", null, item.title);
     const description = item.description ? createElement("p", "detail-item-description", item.description) : null;
     const content = item.content ? createElement("p", null, item.content) : null;
@@ -162,6 +168,7 @@ function renderPurchaseItems(purchase) {
     const img = document.createElement("img");
     img.src = book.image || fallbackImage;
     img.alt = book.title || "";
+    img.dataset.fit = imageFit(book.fit);
 
     const title = createElement("h2", null, book.title);
     const description = createElement("p", null, book.description);
@@ -183,7 +190,7 @@ function renderExtraPage(extraId) {
   setText("#detailLabel", extra.label);
   setText("#detailTitle", extra.title);
   setText("#detailDescription", extra.description);
-  setImage("#detailImage", extra.image, extra.title);
+  setImage("#detailImage", extra.image, extra.title, extra.fit);
 
   if (extra.locked) {
     document.body.classList.add("locked-detail-page");
@@ -205,7 +212,7 @@ function renderPurchasePage(purchaseType) {
   setText("#detailTitle", purchase.title);
   setText("#detailDescription", purchase.description);
   setText("#detailContent", "Escolha abaixo o livro que você quer comprar.");
-  setImage("#detailImage", purchase.image, purchase.title);
+  setImage("#detailImage", purchase.image, purchase.title, purchase.fit);
   renderPurchaseItems(purchase);
 }
 

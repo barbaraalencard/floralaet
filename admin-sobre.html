@@ -1,0 +1,59 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sobre a autora | Painel da Flora</title>
+    <link rel="stylesheet" href="styles.css?v=20260704m" />
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell" id="adminRoot">
+      <header class="admin-header">
+        <h1>sobre<br />a autora</h1>
+        <div class="auth-actions">
+          <a class="button ghost" href="admin.html">painel</a>
+          <a class="button ghost" href="sobre.html">ver pÃ¡gina</a>
+          <button class="button primary" id="logoutButton" type="button">sair</button>
+        </div>
+      </header>
+
+      <div class="admin-single-column">
+        <section class="admin-card" aria-labelledby="aboutAdminTitle">
+          <h2 id="aboutAdminTitle">foto e descriÃ§Ã£o</h2>
+          <p class="admin-helper">
+            Cole o link direto da sua foto, escolha o enquadramento e escreva uma descriÃ§Ã£o curta sobre vocÃª.
+          </p>
+          <form class="admin-form" id="aboutForm">
+            <label class="full admin-image-field">
+              <span>link da sua foto</span>
+              <input name="photo" placeholder="cole um link direto da imagem" required />
+              <select name="photoFit">
+                <option value="cover">preencher espaÃ§o</option>
+                <option value="contain">mostrar imagem inteira</option>
+              </select>
+              <img class="admin-image-preview" alt="" />
+            </label>
+            <label class="full">
+              <span>descriÃ§Ã£o sobre vocÃª</span>
+              <textarea name="description" rows="7" required></textarea>
+            </label>
+            <div class="admin-actions">
+              <button class="button primary" type="submit">salvar sobre</button>
+              <p class="admin-status" id="aboutStatus" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js?v=20260703h"></script>
+    <script src="data.js?v=20260704k"></script>
+    <script src="admin.js?v=20260704k"></script>
+  </body>
+</html>
+
+
+

@@ -8,7 +8,16 @@
       name="description"
       content="Um cantinho acolhedor para leitoras acompanharem a escrita, deixarem cartas e descobrirem extras do universo de Flora Laet."
     />
-    <link rel="stylesheet" href="styles.css?v=20260704j" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cantinho da Flora Laet" />
+    <meta
+      property="og:description"
+      content="Acompanhe a escrita, deixe cartas e descubra extras do universo de Flora Laet."
+    />
+    <meta property="og:image" content="assets/escrivaninha-collage.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#fbf5ec" />
+    <link rel="stylesheet" href="styles.css?v=20260704m" />
   </head>
   <body>
     <div class="welcome-screen" id="welcomeScreen" aria-label="Boas-vindas">
@@ -47,6 +56,7 @@
           <a href="#extras"><img class="nav-icon" src="assets/icon-extras.png" alt="" aria-hidden="true" /> extras</a>
           <a href="#mural"><img class="nav-icon" src="assets/icon-mural.png" alt="" aria-hidden="true" /> mural</a>
           <a href="#comprar"><img class="nav-icon" src="assets/icon-livros.png" alt="" aria-hidden="true" /> adquirir livros</a>
+          <a href="sobre.html"><img class="nav-icon" src="assets/icon-flora.png" alt="" aria-hidden="true" /> sobre a autora</a>
           <a href="login.html"><img class="nav-icon" src="assets/icon-flora.png" alt="" aria-hidden="true" /> área da flora</a>
         </nav>
 
@@ -252,6 +262,10 @@
 
         <footer class="site-footer">
           <p>feito com ♡ para leitoras incríveis</p>
+          <p class="site-counters">
+            <span><strong id="onlineCount">...</strong> online</span>
+            <span><strong id="visitCount">...</strong> visitas</span>
+          </p>
           <p>© 2026 Flora Laet</p>
         </footer>
       </div>
@@ -261,7 +275,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js?v=20260703h"></script>
-    <script src="data.js?v=20260704h"></script>
-    <script src="app.js?v=20260704h"></script>
+    <script src="data.js?v=20260704k"></script>
+    <script src="app.js?v=20260704k"></script>
   </body>
 </html>
+
+
+
